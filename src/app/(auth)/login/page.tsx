@@ -42,7 +42,7 @@ export default function LoginPage() {
       }
 
       toast.success('Welcome back!');
-      router.push('/');
+      router.push('/dashboard');
       router.refresh(); // Refresh to update auth state
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Invalid credentials');

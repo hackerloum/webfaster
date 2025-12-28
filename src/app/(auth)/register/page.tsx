@@ -52,7 +52,7 @@ export default function RegisterPage() {
       }
 
       toast.success('Account created successfully!');
-      router.push('/');
+      router.push('/dashboard');
       router.refresh(); // Refresh to update auth state
     } catch (error) {
       console.error('Registration error:', error);

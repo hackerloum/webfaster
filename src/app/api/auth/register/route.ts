@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db/prisma';
+import { supabase } from '@/lib/db/supabase';
 import { hashPassword, generateToken } from '@/lib/utils/auth';
 import { z } from 'zod';
 
@@ -12,31 +12,17 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if DATABASE_URL is set and valid
-    const databaseUrl = process.env.DATABASE_URL;
-    if (!databaseUrl) {
-      console.error('DATABASE_URL is not set');
+    // Check if Supabase env vars are set
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'CONFIGURATION_ERROR',
-            message: 'Database not configured. Please set DATABASE_URL in your Vercel environment variables.',
-          },
-        },
-        { status: 500 }
-      );
-    }
-
-    // Validate DATABASE_URL format
-    if (!databaseUrl.startsWith('postgresql://') && !databaseUrl.startsWith('postgres://')) {
-      console.error('DATABASE_URL has invalid format:', databaseUrl.substring(0, 20) + '...');
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'CONFIGURATION_ERROR',
-            message: 'Invalid DATABASE_URL format. It must start with "postgresql://" or "postgres://". Please check your Vercel environment variables.',
+            message: 'Supabase not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your Vercel environment variables.',
           },
         },
         { status: 500 }
@@ -62,9 +48,11 @@ export async function POST(request: NextRequest) {
     const { name, email, password } = registerSchema.parse(body);
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const { data: existingUser } = await supabase
+      .from('"User"')
+      .select('id, email')
+      .eq('email', email)
+      .maybeSingle();
 
     if (existingUser) {
       return NextResponse.json(
@@ -77,20 +65,29 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hashPassword(password);
 
     // Create user
-    const user = await prisma.user.create({
-      data: {
+    const { data: user, error: insertError } = await supabase
+      .from('"User"')
+      .insert({
         name,
         email,
         password: hashedPassword,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        image: true,
-        createdAt: true,
-      },
-    });
+      })
+      .select('id, email, name, image, "createdAt"')
+      .single();
+
+    if (insertError) {
+      if (insertError.code === '23505') { // Unique constraint violation
+        return NextResponse.json(
+          { success: false, error: { code: 'USER_EXISTS', message: 'User with this email already exists' } },
+          { status: 400 }
+        );
+      }
+      throw insertError;
+    }
+
+    if (!user) {
+      throw new Error('Failed to create user');
+    }
 
     // Generate token
     const token = generateToken(user.id, user.email);
@@ -131,8 +128,7 @@ export async function POST(request: NextRequest) {
     // Provide more specific error messages
     let errorMessage = 'Failed to create account. Please try again.';
     if (error instanceof Error) {
-      // Check for Prisma errors
-      if (error.message.includes('Unique constraint')) {
+      if (error.message.includes('Unique constraint') || error.message.includes('duplicate')) {
         errorMessage = 'An account with this email already exists.';
       } else if (error.message.includes('connect') || error.message.includes('database')) {
         errorMessage = 'Database connection error. Please check your database configuration.';
