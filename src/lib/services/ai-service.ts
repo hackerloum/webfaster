@@ -65,21 +65,35 @@ CONTENT GUIDELINES:
 - Include appropriate CTAs (Call-to-Actions) with action-oriented text
 - Make content scannable with bullet points, short paragraphs, and clear sections
 
+IMAGE REQUIREMENTS:
+- ALWAYS include images in hero sections (use high-quality placeholder URLs)
+- Use descriptive placeholder image URLs like: "https://images.unsplash.com/photo-[ID]?w=1200&h=600&fit=crop" or "https://via.placeholder.com/1200x600/[COLOR]/ffffff?text=[DESCRIPTION]"
+- For hero sections: Include backgroundImage in content (e.g., "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop")
+- For feature sections: Include image URLs for each feature
+- For about sections: Include team/company images
+- For gallery sections: Include multiple image URLs
+- Images should be contextually relevant (e.g., tech images for tech companies, food images for restaurants)
+- Use Unsplash or similar high-quality placeholder services
+- Always set imageAlt text for accessibility
+
 SECTION TYPES & BEST PRACTICES:
 
 **Hero Section:**
 - Large, attention-grabbing headline (8-12 words max)
 - Compelling subheadline that explains value proposition
 - Clear primary CTA button
-- Optional: Secondary CTA, hero image/illustration
-- Background: Can use gradients, images, or solid colors
+- MUST include: backgroundImage in content (high-quality image URL)
+- Optional: Secondary CTA, overlay gradient for text readability
+- Background: Use backgroundImage with optional gradient overlay
 - Height: Full viewport or substantial (80-100vh on desktop)
+- Example image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop" for tech/business
 
 **Features Section:**
 - 3-6 feature cards with icons/illustrations
-- Each feature: Icon, title (3-5 words), description (1-2 sentences)
+- Each feature: Icon/image URL, title (3-5 words), description (1-2 sentences)
+- Include image URLs for each feature (e.g., "https://images.unsplash.com/photo-[ID]?w=400&h=300&fit=crop")
 - Grid layout: 3 columns on desktop, 2 on tablet, 1 on mobile
-- Use consistent card styling with hover effects
+- Use consistent card styling with hover effects, shadows, and rounded corners
 
 **About Section:**
 - Company/person story (2-3 paragraphs)
@@ -158,6 +172,10 @@ You MUST return ONLY valid JSON matching this exact structure. Do NOT include ma
       "type": "hero|about|features|services|pricing|testimonials|team|contact|footer|cta|gallery|custom",
       "content": {
         // Section-specific content (see examples below)
+        // For hero: heading, subheading, ctaText, ctaLink, backgroundImage, imageAlt
+        // For features: heading, features: [{title, description, image, icon}]
+        // For about: heading, description, image, imageAlt
+        // ALWAYS include image URLs where appropriate
       },
       "styles": {
         "backgroundColor": "#hex-color or gradient",
@@ -172,7 +190,7 @@ You MUST return ONLY valid JSON matching this exact structure. Do NOT include ma
 
 CRITICAL RULES:
 1. Generate 4-8 sections minimum (hero + 3-7 other sections)
-2. Always include a hero section as the first section
+2. Always include a hero section as the first section WITH a backgroundImage
 3. Always include a footer as the last section
 4. Content must be REAL and relevant (no placeholders)
 5. Use appropriate section types based on the user's request
@@ -181,6 +199,10 @@ CRITICAL RULES:
 8. All text must be in English unless user specifies otherwise
 9. Make content compelling and conversion-focused
 10. Ensure mobile responsiveness in design decisions
+11. ALWAYS include images: hero sections MUST have backgroundImage, features should have images
+12. Use high-quality image URLs from Unsplash or similar (e.g., "https://images.unsplash.com/photo-[ID]?w=1200&h=600&fit=crop")
+13. Include proper styling: gradients, shadows, rounded corners, hover effects
+14. Make sections visually appealing with proper spacing, typography, and color contrast
 
 Remember: Quality over quantity. Create a website that looks like it was designed by a top-tier agency.`;
   }
@@ -390,21 +412,34 @@ Generate the complete website structure as JSON now.`;
 
   async modifySection(section: Section, instruction: string): Promise<Section> {
     try {
-      const systemPrompt = `You are an expert web designer. Modify the provided section according to the user's instruction while maintaining design consistency and quality.
+      const systemPrompt = `You are an expert web designer with 15+ years of experience. Modify the provided section according to the user's instruction while maintaining design consistency and quality.
 
-RULES:
-- Preserve the section's ID and order
-- Maintain the overall design style
-- Follow the same content structure
-- Ensure accessibility and responsiveness
-- Return ONLY the modified section as valid JSON (no markdown, no explanations)`;
+CRITICAL RULES:
+- Preserve the section's ID exactly as provided (do not change it)
+- Preserve the section's order exactly as provided (do not change it)
+- Maintain the section type (do not change it)
+- Follow the EXACT same JSON structure as the input section
+- Ensure all required fields are present
+- If adding images, use high-quality placeholder URLs (e.g., "https://images.unsplash.com/photo-[ID]?w=1200&h=600&fit=crop")
+- Apply the user's instruction precisely while keeping the structure intact
+- Return ONLY the modified section as valid JSON (no markdown, no explanations, no code blocks)
+- Start directly with { and end with }
 
-      const userPrompt = `Current section:
+OUTPUT FORMAT:
+Return the complete section object with ALL fields, including:
+- id (must match original)
+- type (must match original)
+- order (must match original)
+- content (modified according to instruction)
+- styles (modified according to instruction)
+- visible (preserve original value)`;
+
+      const userPrompt = `Current section (modify this according to the instruction):
 ${JSON.stringify(section, null, 2)}
 
 User instruction: ${instruction}
 
-Return the modified section as JSON matching the original structure.`;
+IMPORTANT: Return the COMPLETE modified section as JSON. Include ALL fields (id, type, order, content, styles, visible). The id, type, and order must remain exactly the same. Only modify content and styles according to the instruction.`;
 
       const client = getOpenAIClient();
       const model = process.env.OPENAI_MODEL || 'gpt-4o';
@@ -434,22 +469,41 @@ Return the modified section as JSON matching the original structure.`;
       let parsedContent;
       try {
         parsedContent = JSON.parse(content);
-      } catch {
+      } catch (parseError) {
+        // Try to extract JSON from markdown code blocks or text
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          parsedContent = JSON.parse(jsonMatch[0]);
+          try {
+            parsedContent = JSON.parse(jsonMatch[0]);
+          } catch {
+            throw new Error('Failed to parse JSON from response');
+          }
         } else {
-          throw new Error('Failed to parse response');
+          throw new Error('No valid JSON found in response');
         }
       }
 
-      const modifiedSection = this.parserService.parseSectionResponse(JSON.stringify(parsedContent));
+      // Validate that we got a section object
+      if (!parsedContent || typeof parsedContent !== 'object') {
+        throw new Error('Invalid response format: expected section object');
+      }
 
-      return {
-        ...modifiedSection,
-        id: section.id, // Preserve original ID
-        order: section.order, // Preserve order
+      // Ensure required fields are present and preserve critical fields
+      const modifiedSection: Section = {
+        id: section.id, // CRITICAL: Always preserve original ID
+        type: section.type, // CRITICAL: Always preserve original type
+        order: section.order, // CRITICAL: Always preserve original order
+        content: parsedContent.content || section.content, // Use modified or fallback to original
+        styles: parsedContent.styles || section.styles, // Use modified or fallback to original
+        visible: parsedContent.visible !== undefined ? parsedContent.visible : section.visible, // Use modified or fallback to original
       };
+
+      // Validate the section structure
+      if (!modifiedSection.content || !modifiedSection.styles) {
+        throw new Error('Modified section missing required fields (content or styles)');
+      }
+
+      return modifiedSection;
     } catch (error) {
       console.error('AI Modification Error:', error);
       throw new Error('Failed to modify section. Please try again.');

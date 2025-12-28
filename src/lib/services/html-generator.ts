@@ -168,19 +168,40 @@ export class HTMLGenerator {
 
   private generateHeroSection(section: Section, styles: string): string {
     const { content } = section;
+    const hasBackgroundImage = content.backgroundImage || content.image;
+    const backgroundImage = content.backgroundImage || content.image;
+    const imageAlt = content.imageAlt || content.alt || 'Hero image';
+    
+    // If there's a background image, add overlay for text readability
+    const backgroundStyle = hasBackgroundImage 
+      ? `background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${backgroundImage}); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 80vh; display: flex; align-items: center;`
+      : '';
+    
+    const textColor = hasBackgroundImage ? 'color: white;' : '';
+    
     return `
-      <section data-section-id="${section.id}" style="${styles}">
-        <div class="container" style="text-align: center; padding: 5rem 1rem;">
-          <h1>${content.heading || 'Welcome'}</h1>
-          <p style="font-size: 1.25rem; margin-bottom: 2rem; color: #6b7280;">${content.subheading || ''}</p>
+      <section data-section-id="${section.id}" style="${styles} ${backgroundStyle}">
+        <div class="container" style="text-align: center; padding: 5rem 1rem; width: 100%; ${textColor}">
+          <h1 style="${textColor} text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${content.heading || 'Welcome'}</h1>
+          <p style="font-size: 1.25rem; margin-bottom: 2rem; ${textColor} text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${content.subheading || ''}</p>
           ${
             content.ctaText
-              ? `<a href="${content.ctaLink || '#'}" class="btn">${content.ctaText}</a>`
+              ? `<a href="${content.ctaLink || '#'}" class="btn" style="background-color: ${this.getPrimaryColor(section)}; color: white; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">${content.ctaText}</a>`
+              : ''
+          }
+          ${
+            content.secondaryCtaText
+              ? `<a href="${content.secondaryCtaLink || '#'}" style="margin-left: 1rem; padding: 1rem 2rem; border: 2px solid white; color: white; text-decoration: none; border-radius: 0.375rem; display: inline-block; font-weight: 600;">${content.secondaryCtaText}</a>`
               : ''
           }
         </div>
       </section>
     `;
+  }
+  
+  private getPrimaryColor(section: Section): string {
+    // Try to get primary color from section styles or default
+    return '#3b82f6'; // Default blue
   }
 
   private generateFeaturesSection(section: Section, styles: string): string {
@@ -190,16 +211,22 @@ export class HTMLGenerator {
     return `
       <section data-section-id="${section.id}" style="${styles}">
         <div class="container" style="padding: 4rem 1rem;">
-          <h2 style="text-align: center; margin-bottom: 3rem;">${content.heading || 'Features'}</h2>
+          <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; font-weight: 700;">${content.heading || 'Features'}</h2>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
             ${features
               .map(
-                (feature: any) => `
-              <div style="padding: 2rem; border-radius: 0.5rem; background: #f9fafb;">
-                <h3>${feature.title || ''}</h3>
-                <p>${feature.description || ''}</p>
+                (feature: any) => {
+                  const hasImage = feature.image || feature.icon;
+                  const imageUrl = feature.image || feature.icon;
+                  return `
+              <div style="padding: 2rem; border-radius: 1rem; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';">
+                ${hasImage ? `<img src="${imageUrl}" alt="${feature.imageAlt || feature.title || 'Feature'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1.5rem;" />` : ''}
+                ${feature.icon ? `<div style="font-size: 3rem; margin-bottom: 1rem; text-align: center;">${feature.icon}</div>` : ''}
+                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937;">${feature.title || ''}</h3>
+                <p style="color: #6b7280; line-height: 1.6;">${feature.description || ''}</p>
               </div>
-            `
+            `;
+                }
               )
               .join('')}
           </div>
@@ -210,11 +237,25 @@ export class HTMLGenerator {
 
   private generateAboutSection(section: Section, styles: string): string {
     const { content } = section;
+    const hasImage = content.image || content.backgroundImage;
+    const imageUrl = content.image || content.backgroundImage;
+    const imageAlt = content.imageAlt || content.alt || 'About us';
+    
     return `
       <section data-section-id="${section.id}" style="${styles}">
         <div class="container" style="padding: 4rem 1rem;">
-          <h2>${content.heading || 'About Us'}</h2>
-          <p>${content.text || ''}</p>
+          <div style="display: grid; grid-template-columns: ${hasImage ? '1fr 1fr' : '1fr'}; gap: 3rem; align-items: center;">
+            ${hasImage ? `
+            <div>
+              <img src="${imageUrl}" alt="${imageAlt}" style="width: 100%; height: auto; border-radius: 1rem; box-shadow: 0 8px 16px rgba(0,0,0,0.1);" />
+            </div>
+            ` : ''}
+            <div>
+              <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem;">${content.heading || 'About Us'}</h2>
+              <p style="font-size: 1.1rem; line-height: 1.8; color: #4b5563; margin-bottom: 1rem;">${content.text || content.description || ''}</p>
+              ${content.mission ? `<p style="font-size: 1.1rem; line-height: 1.8; color: #4b5563; margin-top: 1.5rem;"><strong>Our Mission:</strong> ${content.mission}</p>` : ''}
+            </div>
+          </div>
         </div>
       </section>
     `;
