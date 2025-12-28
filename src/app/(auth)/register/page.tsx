@@ -46,14 +46,18 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error?.message || 'Failed to create account');
+        const errorMessage = data.error?.message || 'Failed to create account';
+        console.error('Registration failed:', data.error);
+        throw new Error(errorMessage);
       }
 
       toast.success('Account created successfully!');
       router.push('/');
       router.refresh(); // Refresh to update auth state
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create account');
+      console.error('Registration error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create account';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

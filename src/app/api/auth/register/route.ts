@@ -12,6 +12,36 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if DATABASE_URL is set
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not set');
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'CONFIGURATION_ERROR',
+            message: 'Database not configured. Please set DATABASE_URL in your environment variables.',
+          },
+        },
+        { status: 500 }
+      );
+    }
+
+    // Check if JWT_SECRET is set
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not set');
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'CONFIGURATION_ERROR',
+            message: 'JWT secret not configured. Please set JWT_SECRET in your environment variables.',
+          },
+        },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, password } = registerSchema.parse(body);
 
@@ -81,12 +111,26 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Registration error:', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to create account. Please try again.';
+    if (error instanceof Error) {
+      // Check for Prisma errors
+      if (error.message.includes('Unique constraint')) {
+        errorMessage = 'An account with this email already exists.';
+      } else if (error.message.includes('connect') || error.message.includes('database')) {
+        errorMessage = 'Database connection error. Please check your database configuration.';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'REGISTRATION_FAILED',
-          message: 'Failed to create account. Please try again.',
+          message: errorMessage,
         },
       },
       { status: 500 }
