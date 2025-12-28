@@ -136,11 +136,7 @@ export default function HomePage() {
       {!showGenerator ? (
         <LandingPage onGetStarted={handleGetStarted} />
       ) : (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-          <div id="generator" className="pt-20">
-            <GeneratorInterface onGenerate={handleGenerate} />
-          </div>
-        </div>
+        <GeneratorInterface onGenerate={handleGenerate} />
       )}
     </>
   );
