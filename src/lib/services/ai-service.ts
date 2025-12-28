@@ -123,7 +123,7 @@ COLOR SCHEME GUIDELINES:
 - Always ensure sufficient contrast (minimum 4.5:1 for text)
 
 OUTPUT FORMAT:
-Return ONLY valid JSON matching this exact structure (no markdown, no explanations, just JSON):
+You MUST return ONLY valid JSON matching this exact structure. Do NOT include markdown code blocks, explanations, or any text outside the JSON object. Start directly with the opening brace { and end with the closing brace }.
 {
   "metadata": {
     "title": "Website Title - Should be specific and SEO-friendly",
