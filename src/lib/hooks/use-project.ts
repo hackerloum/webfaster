@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useWebsiteStore } from '@/store/website-store';
 
 export function useProject(projectId: string | null) {
@@ -7,13 +7,7 @@ export function useProject(projectId: string | null) {
   const currentWebsite = useWebsiteStore((state) => state.currentWebsite);
   const setWebsite = useWebsiteStore((state) => state.setWebsite);
 
-  useEffect(() => {
-    if (projectId && projectId !== currentWebsite?.id) {
-      loadProject(projectId);
-    }
-  }, [projectId]);
-
-  const loadProject = async (id: string) => {
+  const loadProject = useCallback(async (id: string) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -28,7 +22,13 @@ export function useProject(projectId: string | null) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [setWebsite]);
+
+  useEffect(() => {
+    if (projectId && projectId !== currentWebsite?.id) {
+      loadProject(projectId);
+    }
+  }, [projectId, currentWebsite?.id, loadProject]);
 
   return { isLoading, error, website: currentWebsite };
 }

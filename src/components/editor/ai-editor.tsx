@@ -7,7 +7,6 @@ import { useEditorStore } from '@/store/editor-store';
 import { Button } from '@/components/ui/button';
 import { Wand2, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { AIService } from '@/lib/services/ai-service';
 
 interface AIEditorProps {
   section: Section;
@@ -27,8 +26,26 @@ export function AIEditor({ section }: AIEditorProps) {
 
     setGenerating(true);
     try {
-      const aiService = new AIService();
-      const modifiedSection = await aiService.modifySection(section, instruction);
+      // Call the API route instead of using AIService directly
+      const response = await fetch('/api/ai/modify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ section, instruction }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to modify section');
+      }
+
+      const result = await response.json();
+      if (!result.success || !result.data) {
+        throw new Error(result.error?.message || 'Failed to modify section');
+      }
+
+      const modifiedSection = result.data.section;
       updateSection(section.id, modifiedSection);
       toast.success('Section modified successfully!');
       setInstruction('');

@@ -22,7 +22,7 @@ A production-ready, enterprise-level AI-powered website builder built with Next.
 - **UI Components**: Radix UI primitives
 - **Code Editor**: Monaco Editor
 - **AI Integration**: OpenAI GPT-4 API
-- **Database**: MySQL with Prisma ORM (PlanetScale, Railway, or self-hosted)
+- **Database**: Supabase (PostgreSQL) with Prisma ORM
 - **Deployment**: Vercel
 - **Authentication**: NextAuth.js
 - **Icons**: Lucide React
@@ -35,7 +35,7 @@ A production-ready, enterprise-level AI-powered website builder built with Next.
 ### Prerequisites
 
 - Node.js 18+ and npm
-- MySQL database (PlanetScale, Railway, AWS RDS, or local MySQL)
+- Supabase account (free tier works) or PostgreSQL database
 - OpenAI API key
 
 ### Installation
@@ -57,27 +57,21 @@ npm install
 
 Create a `.env.local` file in the root directory:
 
-#### MySQL Database Setup
+#### Supabase Setup
 
-**Option 1: PlanetScale (Recommended for Vercel)**
-1. Sign up at [planetscale.com](https://planetscale.com)
-2. Create a new database
-3. Get connection string from Database > Connect
-4. Format: `mysql://[USER]:[PASSWORD]@[HOST]/[DATABASE]?sslaccept=strict`
-
-**Option 2: Railway**
-1. Sign up at [railway.app](https://railway.app)
-2. Add MySQL service to your project
-3. Copy connection string from Variables tab
-
-**Option 3: Local MySQL**
-1. Install and start MySQL
-2. Create database: `CREATE DATABASE ai_website_builder;`
-3. Use: `mysql://root:[PASSWORD]@localhost:3306/ai_website_builder`
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Go to **Settings > Database** to get your connection string
+3. Use the connection pooler URL for production (recommended for Vercel):
+   - Pooled connection (port 6543): `postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres`
+   - Direct connection (port 5432): `postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`
 
 ```env
-# Database - MySQL
-DATABASE_URL="mysql://user:password@host:port/database"
+# Database - Supabase
+# Use pooled connection for production (Vercel/serverless)
+DATABASE_URL="postgresql://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres"
+
+# Optional: Direct connection for migrations (if using pooler above)
+# DIRECT_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 
 # OpenAI
 OPENAI_API_KEY="your-openai-api-key"
@@ -102,11 +96,10 @@ npm run db:generate
 npm run db:push
 ```
 
-**MySQL Tips:**
-- For PlanetScale: Add `relationMode = "prisma"` to your Prisma schema datasource
-- After running `db:push`, verify your tables with `SHOW TABLES;` or Prisma Studio
-- For production migrations, use: `npx prisma migrate deploy`
-- MySQL requires version 5.7.8+ for JSON column support
+**Supabase Tips:**
+- If you're using the connection pooler, you may need to temporarily use the direct connection URL for migrations
+- After running `db:push`, verify your tables in Supabase Dashboard > Table Editor
+- For production migrations, consider using Prisma Migrate: `npx prisma migrate dev`
 
 5. **Run the development server**
 
@@ -233,7 +226,7 @@ npm run db:studio
 
 ## Deployment
 
-### Vercel + MySQL Deployment
+### Vercel + Supabase Deployment
 
 1. **Push your code to GitHub**
    ```bash
@@ -251,7 +244,7 @@ npm run db:studio
 
 3. **Configure Environment Variables in Vercel**
    Go to Project Settings > Environment Variables and add:
-   - `DATABASE_URL`: Your MySQL connection string (e.g., PlanetScale, Railway)
+   - `DATABASE_URL`: Your Supabase pooled connection string (port 6543)
    - `OPENAI_API_KEY`: Your OpenAI API key
    - `NEXTAUTH_URL`: Your production URL (e.g., `https://your-app.vercel.app`)
    - `NEXTAUTH_SECRET`: Generate using `openssl rand -base64 32`
@@ -264,7 +257,7 @@ npm run db:studio
      npx prisma migrate deploy
      ```
 
-5. **Set up MySQL Database**
+5. **Set up Supabase Database**
    - After first deployment, make sure your database schema is pushed:
      ```bash
      # Run this locally or in Vercel CLI
@@ -276,7 +269,7 @@ npm run db:studio
      npx prisma migrate deploy
      ```
 
-**Important:** For PlanetScale, use the branch connection string. For other providers, ensure connection pooling is enabled for serverless environments.
+**Important:** Use the **pooled connection string** (port 6543) for `DATABASE_URL` in Vercel to avoid connection limit issues in serverless environments.
 
 ### Other Platforms
 
@@ -295,7 +288,8 @@ Make sure to:
 
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
-| `DATABASE_URL` | MySQL connection string | Yes | `mysql://user:pass@host:3306/database` |
+| `DATABASE_URL` | Supabase PostgreSQL connection string (use pooled connection for Vercel) | Yes | `postgresql://postgres.[REF]:[PASS]@aws-0-[REGION].pooler.supabase.com:6543/postgres` |
+| `DIRECT_URL` | Optional: Direct connection for migrations | No | `postgresql://postgres:[PASS]@db.[REF].supabase.co:5432/postgres` |
 | `OPENAI_API_KEY` | OpenAI API key | Yes | `sk-...` |
 | `NEXTAUTH_URL` | Application URL (use production URL in Vercel) | Yes | `https://your-app.vercel.app` |
 | `NEXTAUTH_SECRET` | Secret for NextAuth.js (generate with `openssl rand -base64 32`) | Yes | Random 32+ character string |

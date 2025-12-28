@@ -1,4 +1,4 @@
-# MySQL Database Setup Guide
+# Database Setup Guide
 
 ## Option 1: Using Prisma (Recommended)
 
@@ -6,29 +6,22 @@ This is the easiest and recommended way to set up your database.
 
 ### Steps:
 
-1. **Choose a MySQL provider** (examples below):
-   - **PlanetScale** (Recommended for serverless/Vercel) - Free tier available
-   - **Railway** - Easy setup, free tier
-   - **AWS RDS** - Enterprise-grade
-   - **DigitalOcean** - Managed MySQL
-   - **Local MySQL** - For development
+1. **Get your Supabase connection string**
+   - Go to Supabase Dashboard > Settings > Database
+   - Copy the **Connection String** (use "URI" format)
+   - Use the direct connection (port 5432) for migrations
 
-2. **Get your MySQL connection string**
-   - Format: `mysql://user:password@host:port/database`
-   - Example (PlanetScale): `mysql://root:password@aws.connect.psdb.cloud/database?sslaccept=strict`
-   - Example (Local): `mysql://root:password@localhost:3306/ai_website_builder`
-
-3. **Create `.env.local` file** in the root of your project:
+2. **Create `.env.local` file** in the root of your project:
    ```env
-   DATABASE_URL="mysql://user:password@host:port/database"
+   DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
    ```
 
-4. **Run Prisma commands**:
+3. **Run Prisma commands**:
    ```bash
    # Generate Prisma Client
    npm run db:generate
 
-   # Push schema to MySQL database
+   # Push schema to Supabase database
    npm run db:push
    ```
 
@@ -36,64 +29,31 @@ That's it! Your database tables will be created automatically.
 
 ---
 
-## Option 2: Run SQL Directly
+## Option 2: Run SQL Directly in Supabase
 
 If you prefer to run SQL directly, follow these steps:
 
 ### Steps:
 
-1. **Connect to your MySQL database**
-   - Using MySQL CLI: `mysql -u root -p`
-   - Using phpMyAdmin, MySQL Workbench, or your database GUI
-   - Using PlanetScale CLI: `pscale connect database-name`
+1. **Open Supabase SQL Editor**
+   - Go to your Supabase project dashboard
+   - Click on **SQL Editor** in the left sidebar
+   - Click **New Query**
 
-2. **Select your database**
-   ```sql
-   CREATE DATABASE IF NOT EXISTS ai_website_builder;
-   USE ai_website_builder;
-   ```
-
-3. **Copy and paste the SQL**
-   - Open `mysql-schema.sql` file
+2. **Copy and paste the SQL**
+   - Open `supabase-schema.sql` file
    - Copy all the SQL code
-   - Paste and execute it
+   - Paste it into the Supabase SQL Editor
+   - Click **Run** (or press `Ctrl+Enter` / `Cmd+Enter`)
 
-4. **Verify tables were created**
-   ```sql
-   SHOW TABLES;
-   DESCRIBE User;
-   DESCRIBE Project;
-   ```
+3. **Verify tables were created**
+   - Go to **Table Editor** in Supabase
+   - You should see `User` and `Project` tables
 
-5. **Generate Prisma Client** (still needed for your app):
+4. **Generate Prisma Client** (still needed for your app):
    ```bash
    npm run db:generate
    ```
-
----
-
-## MySQL Provider Setup Guides
-
-### PlanetScale (Recommended for Vercel)
-
-1. Sign up at [planetscale.com](https://planetscale.com)
-2. Create a new database
-3. Get connection string from Database > Connect
-4. Use the connection string as `DATABASE_URL`
-5. **Important:** Add `relationMode = "prisma"` to `prisma/schema.prisma` datasource (for PlanetScale branch-based workflow)
-
-### Railway
-
-1. Sign up at [railway.app](https://railway.app)
-2. Create new project > Add MySQL service
-3. Copy connection string from Variables tab
-4. Use as `DATABASE_URL`
-
-### Local MySQL
-
-1. Install MySQL (via XAMPP, Homebrew, or MySQL installer)
-2. Create database: `CREATE DATABASE ai_website_builder;`
-3. Use connection string: `mysql://root:password@localhost:3306/ai_website_builder`
 
 ---
 
@@ -111,13 +71,13 @@ Your database has 2 tables:
 - `updatedAt` (Timestamp) - Last update date
 
 ### `Project` Table
-- `id` (Varchar, Primary Key) - Unique project identifier
-- `userId` (Varchar, Foreign Key) - Links to User.id
-- `title` (Varchar) - Project title
-- `description` (Varchar, Optional) - Project description
-- `data` (JSON) - Stores the website structure as JSON
-- `createdAt` (DateTime) - Project creation date
-- `updatedAt` (DateTime) - Last update date
+- `id` (Text, Primary Key) - Unique project identifier
+- `userId` (Text, Foreign Key) - Links to User.id
+- `title` (Text) - Project title
+- `description` (Text, Optional) - Project description
+- `data` (JSONB) - Stores the website structure as JSON
+- `createdAt` (Timestamp) - Project creation date
+- `updatedAt` (Timestamp) - Last update date
 
 ### Relationships
 - One User can have many Projects (One-to-Many)
@@ -127,10 +87,10 @@ Your database has 2 tables:
 
 ## Verify Setup
 
-### Check in your MySQL database:
-1. Run `SHOW TABLES;` - You should see `User` and `Project`
-2. Run `DESCRIBE User;` and `DESCRIBE Project;` to see columns
-3. Or use your database GUI (phpMyAdmin, MySQL Workbench, etc.)
+### Check in Supabase:
+1. Go to **Table Editor**
+2. You should see both `User` and `Project` tables
+3. Click on each table to see the columns
 
 ### Check with Prisma Studio:
 ```bash
@@ -144,24 +104,18 @@ This opens a visual database browser at `http://localhost:5555`
 
 ### If Prisma db:push fails:
 - Make sure your `DATABASE_URL` is correct
-- Check that MySQL server is running (if local)
-- Verify user has CREATE TABLE permissions
-- For PlanetScale: Make sure you're using the correct branch connection string
+- Use the direct connection (port 5432) for migrations, not the pooled one
+- Check that your Supabase project is active (free tier can pause)
 
 ### If SQL script fails:
-- Make sure you selected the correct database: `USE database_name;`
-- Check MySQL version (requires MySQL 5.7+ for JSON support)
+- Make sure you're running it in the SQL Editor (not Table Editor)
+- Check for any syntax errors
 - If tables already exist, you can drop them first:
   ```sql
-  DROP TABLE IF EXISTS `Project`;
-  DROP TABLE IF EXISTS `User`;
+  DROP TABLE IF EXISTS "Project";
+  DROP TABLE IF EXISTS "User";
   ```
   Then run the schema script again.
-
-### Common MySQL Issues:
-- **JSON support**: Requires MySQL 5.7.8+ or MariaDB 10.2.7+
-- **Character set**: Tables use `utf8mb4` for full Unicode support (emojis, etc.)
-- **Foreign keys**: Make sure you're using InnoDB engine (default in most setups)
 
 ---
 

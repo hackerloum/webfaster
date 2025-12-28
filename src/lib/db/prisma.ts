@@ -5,13 +5,12 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 /**
- * Prisma Client instance optimized for MySQL and serverless environments (Vercel)
+ * Prisma Client instance optimized for Supabase and serverless environments (Vercel)
  * 
- * MySQL Connection Tips:
- * - For PlanetScale: Use branch connection strings, enable connection pooling
- * - For Railway/other providers: Ensure connection pooling is enabled for serverless
- * - Connection string format: mysql://user:password@host:port/database
- * - MySQL 5.7.8+ required for JSON column support
+ * Supabase Connection Tips:
+ * - Use connection pooling URL (port 6543) for production/serverless
+ * - Direct connection (port 5432) for migrations and Prisma Studio
+ * - Connection string format: postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
  */
 export const prisma =
   globalForPrisma.prisma ??

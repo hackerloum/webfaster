@@ -3,9 +3,29 @@ import { WebsiteStructure, Section } from '@/lib/types/website';
 import { GenerationOptions } from '@/lib/types/editor';
 import { ParserService } from './parser-service';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-});
+// Lazy initialization to prevent browser instantiation
+let openai: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  // Safety check: ensure we're in a server environment
+  if (typeof window !== 'undefined') {
+    throw new Error(
+      'AIService cannot be used in browser. Use API routes instead: /api/ai/generate or /api/ai/modify'
+    );
+  }
+
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
+    openai = new OpenAI({
+      apiKey,
+    });
+  }
+
+  return openai;
+}
 
 export class AIService {
   private parserService: ParserService;
@@ -85,7 +105,8 @@ OUTPUT FORMAT: Return ONLY valid JSON matching this structure:
     try {
       const enhancedPrompt = this.enhancePrompt(prompt, options);
 
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      const response = await client.chat.completions.create({
         model: 'gpt-4.1',
         messages: [
           { role: 'system', content: this.buildSystemPrompt() },
@@ -138,7 +159,8 @@ User instruction: ${instruction}
 
 Return the modified section as JSON.`;
 
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      const response = await client.chat.completions.create({
         model: 'gpt-4.1',
         messages: [
           { role: 'system', content: systemPrompt },
@@ -168,7 +190,8 @@ Return the modified section as JSON.`;
 
   async suggestImprovements(section: Section): Promise<string[]> {
     try {
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      const response = await client.chat.completions.create({
         model: 'gpt-4.1',
         messages: [
           {

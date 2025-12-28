@@ -40,7 +40,7 @@ export function GeneratorInterface({ onGenerate }: GeneratorInterfaceProps) {
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Describe Your Website,
             <br />
-            We'll Build It
+            We&apos;ll Build It
           </h1>
 
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">

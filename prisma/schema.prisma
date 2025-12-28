@@ -5,13 +5,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// MySQL database connection
-// Recommended providers: PlanetScale, Railway, AWS RDS, DigitalOcean, or self-hosted MySQL
+// Supabase (PostgreSQL) database connection
+// Use connection pooler (port 6543) for production/serverless environments (Vercel)
+// Use direct connection (port 5432) for migrations and Prisma Studio
+// Optionally add directUrl for migrations: directUrl = env("DIRECT_URL")
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
-  // For PlanetScale, add: relationMode = "prisma"
-  // For other MySQL providers, you can remove relationMode
 }
 
 model User {
@@ -31,7 +31,7 @@ model Project {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String
   description String?
-  data        Json     // Stores WebsiteStructure as JSON (MySQL JSON type)
+  data        Json     // Stores WebsiteStructure as JSON
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

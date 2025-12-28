@@ -6,7 +6,6 @@ import { LandingPage } from '@/components/landing/landing-page';
 import { GeneratorInterface } from '@/components/generator/generator-interface';
 import { useWebsiteStore } from '@/store/website-store';
 import { useGenerationStore } from '@/store/generation-store';
-import { AIService } from '@/lib/services/ai-service';
 import { toast } from 'react-hot-toast';
 
 export default function HomePage() {
@@ -40,8 +39,26 @@ export default function HomePage() {
 
       setProgress({ step: 2, totalSteps: 4, currentStep: 'Creating website structure...' });
 
-      const aiService = new AIService();
-      const website = await aiService.generateWebsite(userPrompt);
+      // Call the API route instead of using AIService directly
+      const response = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: userPrompt }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to generate website');
+      }
+
+      const result = await response.json();
+      if (!result.success || !result.data) {
+        throw new Error(result.error?.message || 'Failed to generate website');
+      }
+
+      const website = result.data.website;
 
       setProgress({ step: 3, totalSteps: 4, currentStep: 'Designing sections...' });
       await new Promise((resolve) => setTimeout(resolve, 500));
