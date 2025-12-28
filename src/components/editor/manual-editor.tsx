@@ -72,6 +72,19 @@ export function ManualEditor({ section }: ManualEditorProps) {
               </div>
 
               <div>
+                <label className="block text-sm font-medium mb-2 text-white">Background Image URL</label>
+                <input
+                  type="text"
+                  value={editedContent.backgroundImage || editedContent.image || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, backgroundImage: e.target.value, image: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                  placeholder="https://images.unsplash.com/..."
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium mb-2 text-white">CTA Text</label>
                 <input
                   type="text"

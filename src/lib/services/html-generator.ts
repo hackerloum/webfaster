@@ -420,10 +420,59 @@ export class HTMLGenerator {
 
   private generateFooterSection(section: Section, styles: string): string {
     const { content } = section;
+    const companyName = content.companyName || content.name || 'Company';
+    const description = content.description || content.text || '';
+    const copyright = content.copyright || `© ${new Date().getFullYear()} ${companyName}. All rights reserved.`;
+    const links = content.links || {};
+    const socialLinks = content.socialLinks || {};
+    const hasLinks = Object.keys(links).length > 0;
+    const hasSocial = Object.keys(socialLinks).length > 0;
+    
     return `
-      <footer data-section-id="${section.id}" style="${styles} background-color: #1f2937; color: white;">
-        <div class="container" style="padding: 3rem 1rem; text-align: center;">
-          <p>${content.text || '© 2024 All rights reserved.'}</p>
+      <footer data-section-id="${section.id}" style="${styles} background-color: #0f172a; color: white;">
+        <div class="container" style="padding: 4rem 1rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; margin-bottom: 3rem;">
+            <!-- Brand Column -->
+            <div style="grid-column: ${hasLinks ? 'span 1' : '1 / -1'};">
+              <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: white;">${companyName}</h3>
+              ${description ? `<p style="color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 1.5rem; font-size: 0.95rem;">${description}</p>` : ''}
+              ${hasSocial ? `
+              <div style="display: flex; gap: 0.75rem;">
+                ${socialLinks.linkedin ? `<a href="${socialLinks.linkedin}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.2)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">in</a>` : ''}
+                ${socialLinks.twitter ? `<a href="${socialLinks.twitter}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.2)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">🐦</a>` : ''}
+                ${socialLinks.facebook ? `<a href="${socialLinks.facebook}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.2)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">f</a>` : ''}
+                ${socialLinks.instagram ? `<a href="${socialLinks.instagram}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.2)'" onmouseout="this.style.backgroundColor='rgba(255,255,255,0.1)'">📷</a>` : ''}
+              </div>
+              ` : ''}
+            </div>
+            
+            ${hasLinks ? Object.entries(links).map(([columnName, columnLinks]: [string, any]) => `
+            <div>
+              <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: white; text-transform: uppercase; letter-spacing: 0.05em;">${columnName}</h4>
+              <ul style="list-style: none; padding: 0; margin: 0;">
+                ${Array.isArray(columnLinks) ? columnLinks.map((link: any) => {
+                  const linkText = typeof link === 'string' ? link : (link.text || link.label || link.name);
+                  const linkUrl = typeof link === 'string' ? '#' : (link.url || link.href || '#');
+                  return `<li style="margin-bottom: 0.75rem;"><a href="${linkUrl}" style="color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">${linkText}</a></li>`;
+                }).join('') : ''}
+              </ul>
+            </div>
+            `).join('') : ''}
+          </div>
+          
+          <!-- Bottom Section -->
+          <div style="padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 1rem; align-items: center; text-align: center;">
+            <p style="color: rgba(255,255,255,0.6); font-size: 0.875rem; margin: 0;">${copyright}</p>
+            ${content.legalLinks ? `
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center;">
+              ${Array.isArray(content.legalLinks) ? content.legalLinks.map((link: any) => {
+                const linkText = typeof link === 'string' ? link : (link.text || link.label);
+                const linkUrl = typeof link === 'string' ? '#' : (link.url || link.href || '#');
+                return `<a href="${linkUrl}" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.875rem; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.9)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">${linkText}</a>`;
+              }).join('') : ''}
+            </div>
+            ` : ''}
+          </div>
         </div>
       </footer>
     `;
