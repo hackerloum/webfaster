@@ -496,6 +496,19 @@ IMPORTANT: Return the COMPLETE modified section as JSON. Include ALL fields (id,
         content: parsedContent.content || section.content, // Use modified or fallback to original
         styles: parsedContent.styles || section.styles, // Use modified or fallback to original
         visible: parsedContent.visible !== undefined ? parsedContent.visible : section.visible, // Use modified or fallback to original
+        metadata: {
+          generatedByAI: section.metadata?.generatedByAI ?? true,
+          lastEditedAt: new Date(),
+          editHistory: [
+            ...(section.metadata?.editHistory || []),
+            {
+              timestamp: new Date(),
+              type: 'ai' as const,
+              description: 'Section modified by AI',
+              changes: { content: parsedContent.content, styles: parsedContent.styles },
+            },
+          ],
+        },
       };
 
       // Validate the section structure
