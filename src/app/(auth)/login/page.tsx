@@ -24,12 +24,28 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual authentication
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error?.message || 'Invalid credentials');
+      }
+
       toast.success('Welcome back!');
       router.push('/');
+      router.refresh(); // Refresh to update auth state
     } catch (error) {
-      toast.error('Invalid credentials');
+      toast.error(error instanceof Error ? error.message : 'Invalid credentials');
     } finally {
       setIsLoading(false);
     }

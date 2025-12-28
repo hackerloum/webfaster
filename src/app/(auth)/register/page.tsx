@@ -31,12 +31,29 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual registration
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error?.message || 'Failed to create account');
+      }
+
       toast.success('Account created successfully!');
       router.push('/');
+      router.refresh(); // Refresh to update auth state
     } catch (error) {
-      toast.error('Failed to create account');
+      toast.error(error instanceof Error ? error.message : 'Failed to create account');
     } finally {
       setIsLoading(false);
     }
