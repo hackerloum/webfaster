@@ -26,6 +26,8 @@ export function AIEditor({ section }: AIEditorProps) {
 
     setGenerating(true);
     try {
+      console.log('Sending modification request:', { sectionId: section.id, instruction });
+      
       // Call the API route instead of using AIService directly
       const response = await fetch('/api/ai/modify', {
         method: 'POST',
@@ -36,22 +38,63 @@ export function AIEditor({ section }: AIEditorProps) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to modify section');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || `Server error: ${response.status}`;
+        console.error('API error:', errorData);
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
+      console.log('Modification result:', result);
+      
       if (!result.success || !result.data) {
-        throw new Error(result.error?.message || 'Failed to modify section');
+        const errorMessage = result.error?.message || 'Failed to modify section';
+        console.error('Modification failed:', result);
+        throw new Error(errorMessage);
       }
 
       const modifiedSection = result.data.section;
-      updateSection(section.id, modifiedSection);
+      
+      // Validate the modified section has required fields
+      if (!modifiedSection || !modifiedSection.content || !modifiedSection.styles) {
+        console.error('Invalid modified section:', modifiedSection);
+        throw new Error('Invalid section structure returned from AI');
+      }
+
+      // Ensure the section ID matches
+      if (modifiedSection.id !== section.id) {
+        console.warn('Section ID mismatch, correcting...', { 
+          original: section.id, 
+          returned: modifiedSection.id 
+        });
+        modifiedSection.id = section.id;
+      }
+
+      console.log('Updating section:', { 
+        sectionId: section.id, 
+        modifiedContent: modifiedSection.content,
+        modifiedStyles: modifiedSection.styles 
+      });
+
+      // Update the section with the modified data
+      updateSection(section.id, {
+        content: modifiedSection.content,
+        styles: modifiedSection.styles,
+        visible: modifiedSection.visible !== undefined ? modifiedSection.visible : section.visible,
+        metadata: modifiedSection.metadata || section.metadata,
+      });
+
       toast.success('Section modified successfully!');
       setInstruction('');
+      
+      // Force a small delay to ensure state updates
+      setTimeout(() => {
+        console.log('Section update completed');
+      }, 100);
     } catch (error) {
       console.error('AI modification error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to modify section');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to modify section';
+      toast.error(errorMessage);
     } finally {
       setGenerating(false);
     }

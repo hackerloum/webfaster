@@ -488,13 +488,36 @@ IMPORTANT: Return the COMPLETE modified section as JSON. Include ALL fields (id,
         throw new Error('Invalid response format: expected section object');
       }
 
+      // Log the parsed content for debugging
+      console.log('Parsed AI response:', parsedContent);
+      console.log('Original section:', section);
+
+      // Deep merge content and styles to preserve structure
+      const mergedContent = parsedContent.content 
+        ? { ...section.content, ...parsedContent.content }
+        : section.content;
+      
+      const mergedStyles = parsedContent.styles
+        ? {
+            ...section.styles,
+            ...parsedContent.styles,
+            // Deep merge padding and margin if they exist
+            padding: parsedContent.styles.padding 
+              ? { ...section.styles.padding, ...parsedContent.styles.padding }
+              : section.styles.padding,
+            margin: parsedContent.styles.margin
+              ? { ...section.styles.margin, ...parsedContent.styles.margin }
+              : section.styles.margin,
+          }
+        : section.styles;
+
       // Ensure required fields are present and preserve critical fields
       const modifiedSection: Section = {
         id: section.id, // CRITICAL: Always preserve original ID
         type: section.type, // CRITICAL: Always preserve original type
         order: section.order, // CRITICAL: Always preserve original order
-        content: parsedContent.content || section.content, // Use modified or fallback to original
-        styles: parsedContent.styles || section.styles, // Use modified or fallback to original
+        content: mergedContent, // Use merged content
+        styles: mergedStyles, // Use merged styles
         visible: parsedContent.visible !== undefined ? parsedContent.visible : section.visible, // Use modified or fallback to original
         metadata: {
           generatedByAI: section.metadata?.generatedByAI ?? true,
@@ -504,18 +527,28 @@ IMPORTANT: Return the COMPLETE modified section as JSON. Include ALL fields (id,
             {
               timestamp: new Date(),
               type: 'ai' as const,
-              description: 'Section modified by AI',
-              changes: { content: parsedContent.content, styles: parsedContent.styles },
+              description: instruction,
+              changes: { 
+                content: parsedContent.content ? Object.keys(parsedContent.content) : [],
+                styles: parsedContent.styles ? Object.keys(parsedContent.styles) : [],
+              },
             },
           ],
         },
       };
 
       // Validate the section structure
-      if (!modifiedSection.content || !modifiedSection.styles) {
-        throw new Error('Modified section missing required fields (content or styles)');
+      if (!modifiedSection.content || typeof modifiedSection.content !== 'object') {
+        console.error('Invalid content:', modifiedSection.content);
+        throw new Error('Modified section has invalid content');
+      }
+      
+      if (!modifiedSection.styles || typeof modifiedSection.styles !== 'object') {
+        console.error('Invalid styles:', modifiedSection.styles);
+        throw new Error('Modified section has invalid styles');
       }
 
+      console.log('Final modified section:', modifiedSection);
       return modifiedSection;
     } catch (error) {
       console.error('AI Modification Error:', error);
