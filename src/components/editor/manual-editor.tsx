@@ -146,19 +146,30 @@ export function ManualEditor({ section }: ManualEditorProps) {
                   placeholder="https://images.unsplash.com/..."
                 />
               </div>
-              {editedContent.mission && (
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-white">Mission</label>
-                  <textarea
-                    value={editedContent.mission || ''}
-                    onChange={(e) =>
-                      setEditedContent({ ...editedContent, mission: e.target.value })
-                    }
-                    rows={2}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
-                  />
-                </div>
-              )}
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Image Alt Text</label>
+                <input
+                  type="text"
+                  value={editedContent.imageAlt || editedContent.alt || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, imageAlt: e.target.value, alt: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                  placeholder="About us image"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Mission (Optional)</label>
+                <textarea
+                  value={editedContent.mission || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, mission: e.target.value })
+                  }
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                  placeholder="Our mission statement..."
+                />
+              </div>
             </>
           )}
 
@@ -452,21 +463,162 @@ export function ManualEditor({ section }: ManualEditorProps) {
                   className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
                 />
               </div>
+              
+              {/* Testimonials List Editor */}
               <div>
-                <label className="block text-sm font-medium mb-2 text-white">Testimonials (JSON)</label>
-                <textarea
-                  value={JSON.stringify(editedContent.testimonials || editedContent.items || [], null, 2)}
-                  onChange={(e) => {
-                    try {
-                      const parsed = JSON.parse(e.target.value);
-                      setEditedContent({ ...editedContent, testimonials: parsed, items: parsed });
-                    } catch {
-                      // Invalid JSON, ignore
-                    }
-                  }}
-                  rows={10}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
-                />
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-white">Testimonials</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const testimonials = editedContent.testimonials || editedContent.items || [];
+                      const newTestimonial = {
+                        name: '',
+                        role: '',
+                        avatar: '',
+                        rating: 5,
+                        text: '',
+                      };
+                      setEditedContent({
+                        ...editedContent,
+                        testimonials: [...testimonials, newTestimonial],
+                        items: [...testimonials, newTestimonial],
+                      });
+                    }}
+                    className="px-3 py-1.5 bg-purple-500/20 text-purple-300 text-xs rounded-md hover:bg-purple-500/30 transition-colors"
+                  >
+                    + Add Testimonial
+                  </button>
+                </div>
+                
+                <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                  {((editedContent.testimonials || editedContent.items || []) as any[]).map((testimonial: any, index: number) => {
+                    const testimonials = editedContent.testimonials || editedContent.items || [];
+                    return (
+                      <div key={index} className="p-3 bg-white/5 border border-white/10 rounded-lg space-y-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs text-white/60 font-medium">Testimonial #{index + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newTestimonials = testimonials.filter((_: any, i: number) => i !== index);
+                              setEditedContent({
+                                ...editedContent,
+                                testimonials: newTestimonials,
+                                items: newTestimonials,
+                              });
+                            }}
+                            className="text-red-400 hover:text-red-300 text-xs"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-xs text-white/70 mb-1">Name</label>
+                          <input
+                            type="text"
+                            value={testimonial.name || ''}
+                            onChange={(e) => {
+                              const newTestimonials = [...testimonials];
+                              newTestimonials[index] = { ...testimonial, name: e.target.value };
+                              setEditedContent({
+                                ...editedContent,
+                                testimonials: newTestimonials,
+                                items: newTestimonials,
+                              });
+                            }}
+                            className="w-full px-2 py-1.5 bg-white/5 border border-white/20 rounded text-sm text-white placeholder:text-white/30"
+                            placeholder="John Doe"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-xs text-white/70 mb-1">Role/Title</label>
+                          <input
+                            type="text"
+                            value={testimonial.role || testimonial.title || ''}
+                            onChange={(e) => {
+                              const newTestimonials = [...testimonials];
+                              newTestimonials[index] = { ...testimonial, role: e.target.value, title: e.target.value };
+                              setEditedContent({
+                                ...editedContent,
+                                testimonials: newTestimonials,
+                                items: newTestimonials,
+                              });
+                            }}
+                            className="w-full px-2 py-1.5 bg-white/5 border border-white/20 rounded text-sm text-white placeholder:text-white/30"
+                            placeholder="CEO, Company Name"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-xs text-white/70 mb-1">Avatar Image URL</label>
+                          <input
+                            type="text"
+                            value={testimonial.avatar || testimonial.image || ''}
+                            onChange={(e) => {
+                              const newTestimonials = [...testimonials];
+                              newTestimonials[index] = { ...testimonial, avatar: e.target.value, image: e.target.value };
+                              setEditedContent({
+                                ...editedContent,
+                                testimonials: newTestimonials,
+                                items: newTestimonials,
+                              });
+                            }}
+                            className="w-full px-2 py-1.5 bg-white/5 border border-white/20 rounded text-sm text-white placeholder:text-white/30"
+                            placeholder="https://images.unsplash.com/..."
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-xs text-white/70 mb-1">Rating (1-5)</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="5"
+                            value={testimonial.rating || 5}
+                            onChange={(e) => {
+                              const newTestimonials = [...testimonials];
+                              newTestimonials[index] = { ...testimonial, rating: parseInt(e.target.value) || 5 };
+                              setEditedContent({
+                                ...editedContent,
+                                testimonials: newTestimonials,
+                                items: newTestimonials,
+                              });
+                            }}
+                            className="w-full px-2 py-1.5 bg-white/5 border border-white/20 rounded text-sm text-white"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-xs text-white/70 mb-1">Quote/Testimonial Text</label>
+                          <textarea
+                            value={testimonial.text || testimonial.quote || testimonial.content || ''}
+                            onChange={(e) => {
+                              const newTestimonials = [...testimonials];
+                              newTestimonials[index] = { ...testimonial, text: e.target.value, quote: e.target.value, content: e.target.value };
+                              setEditedContent({
+                                ...editedContent,
+                                testimonials: newTestimonials,
+                                items: newTestimonials,
+                              });
+                            }}
+                            rows={3}
+                            className="w-full px-2 py-1.5 bg-white/5 border border-white/20 rounded text-sm text-white placeholder:text-white/30 resize-none"
+                            placeholder="What they said..."
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {((editedContent.testimonials || editedContent.items || []) as any[]).length === 0 && (
+                    <div className="text-center py-8 text-white/40 text-sm">
+                      No testimonials yet. Click "Add Testimonial" to add one.
+                    </div>
+                  )}
+                </div>
               </div>
             </>
           )}
