@@ -72,7 +72,7 @@ export function WebsitePreview() {
           className="bg-white shadow-2xl rounded-lg overflow-hidden border border-white/10 w-full max-w-full"
         >
           <iframe
-            key={html ? `preview-${currentWebsite?.id}-${Date.now()}` : 'preview-empty'}
+            key={`preview-${currentWebsite?.id}-${currentWebsite?.sections?.length || 0}-${currentWebsite?.metadata?.updatedAt?.getTime() || 0}`}
             ref={iframeRef}
             srcDoc={html}
             className="w-full h-full border-0"
