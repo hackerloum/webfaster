@@ -11,15 +11,31 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if DATABASE_URL is set
-    if (!process.env.DATABASE_URL) {
+    // Check if DATABASE_URL is set and valid
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
       console.error('DATABASE_URL is not set');
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'CONFIGURATION_ERROR',
-            message: 'Database not configured. Please set DATABASE_URL in your environment variables.',
+            message: 'Database not configured. Please set DATABASE_URL in your Vercel environment variables.',
+          },
+        },
+        { status: 500 }
+      );
+    }
+
+    // Validate DATABASE_URL format
+    if (!databaseUrl.startsWith('postgresql://') && !databaseUrl.startsWith('postgres://')) {
+      console.error('DATABASE_URL has invalid format:', databaseUrl.substring(0, 20) + '...');
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'CONFIGURATION_ERROR',
+            message: 'Invalid DATABASE_URL format. It must start with "postgresql://" or "postgres://". Please check your Vercel environment variables.',
           },
         },
         { status: 500 }
