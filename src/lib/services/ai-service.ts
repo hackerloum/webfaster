@@ -350,10 +350,9 @@ Generate the complete website structure as JSON now.`;
 
       const client = getOpenAIClient();
       
-      // Use gpt-4o as default, with fallback to gpt-4-turbo-preview
-      // Valid models: gpt-4o, gpt-4o-mini, gpt-4-turbo-preview, gpt-4-0125-preview
-      const primaryModel = process.env.OPENAI_MODEL || 'gpt-4o';
-      const fallbackModel = 'gpt-4-turbo-preview';
+      // Use gpt-4.1 as default, with fallback to gpt-5.2
+      const primaryModel = process.env.OPENAI_MODEL || 'gpt-4.1';
+      const fallbackModel = 'gpt-5.2';
       
       const requestConfig: any = {
         model: primaryModel,
