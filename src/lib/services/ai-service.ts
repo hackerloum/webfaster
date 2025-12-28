@@ -547,6 +547,16 @@ CRITICAL RULES:
 - The content object must maintain its structure (e.g., if it has "heading", "subheading", "features", etc., keep those keys)
 - The styles object must maintain its structure (e.g., if it has "backgroundColor", "padding", etc., keep those keys)
 
+RESPONSIVE DESIGN (CRITICAL - MUST MAINTAIN):
+- When modifying sections, ALWAYS maintain responsive design
+- Keep responsive padding values (smaller on mobile, larger on desktop)
+- Keep responsive font sizes (mobile: smaller, desktop: larger)
+- Keep responsive grid layouts (use auto-fit, minmax for flexibility)
+- Ensure images remain responsive (width: 100%, max-width: 100%, height: auto)
+- Keep buttons touch-friendly on mobile (full-width or minimum 44px)
+- Do NOT remove responsive CSS classes or inline styles
+- Maintain mobile-first approach in all modifications
+
 IMAGE HANDLING (CRITICAL):
 - For hero sections: If user asks to add an image, add "backgroundImage" to the content object with a VERIFIED Unsplash URL
 - Use ONLY these verified URLs (they are guaranteed to work):
