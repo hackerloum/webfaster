@@ -122,6 +122,8 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
 
     const updatedSections = [...currentWebsite.sections];
     const [movedSection] = updatedSections.splice(fromIndex, 1);
+    if (!movedSection) return; // Guard against invalid index
+    
     updatedSections.splice(toIndex, 0, movedSection);
     updatedSections.forEach((s, idx) => (s.order = idx));
 

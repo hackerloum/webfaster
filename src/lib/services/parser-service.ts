@@ -85,11 +85,11 @@ export class ParserService {
       // Extract JSON from markdown code blocks if present
       let jsonStr = response.trim();
       const codeBlockMatch = jsonStr.match(/```json\n([\s\S]*?)\n```/);
-      if (codeBlockMatch) {
+      if (codeBlockMatch && codeBlockMatch[1]) {
         jsonStr = codeBlockMatch[1];
       } else {
         const anyCodeBlockMatch = jsonStr.match(/```\n([\s\S]*?)\n```/);
-        if (anyCodeBlockMatch) {
+        if (anyCodeBlockMatch && anyCodeBlockMatch[1]) {
           jsonStr = anyCodeBlockMatch[1];
         }
       }
@@ -136,7 +136,7 @@ export class ParserService {
     try {
       let jsonStr = response.trim();
       const codeBlockMatch = jsonStr.match(/```json\n([\s\S]*?)\n```/);
-      if (codeBlockMatch) {
+      if (codeBlockMatch && codeBlockMatch[1]) {
         jsonStr = codeBlockMatch[1];
       }
 
