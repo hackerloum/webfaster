@@ -346,8 +346,14 @@ export class HTMLGenerator {
               .map(
                 (plan: any, index: number) => {
                   const isPopular = plan.popular || plan.featured || index === 1;
+                  const boxShadow = isPopular ? '0 8px 16px rgba(0,0,0,0.15)' : '0 4px 6px rgba(0,0,0,0.1)';
+                  const border = isPopular ? '2px solid #3b82f6' : '2px solid transparent';
+                  const bgColor = isPopular ? '#3b82f6' : '#6b7280';
+                  const bgColorHover = isPopular ? '#2563eb' : '#4b5563';
+                  const boxShadowHover = '0 12px 20px rgba(0,0,0,0.2)';
+                  
                   return `
-              <div style="padding: 2.5rem; border-radius: 1rem; background: white; box-shadow: ${isPopular ? '0 8px 16px rgba(0,0,0,0.15)' : '0 4px 6px rgba(0,0,0,0.1)'}; border: ${isPopular ? '2px solid #3b82f6' : '2px solid transparent'}; transition: transform 0.3s, box-shadow 0.3s; position: relative;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 20px rgba(0,0,0,0.2)';" onmouseout="this.style.transform=''; this.style.boxShadow='${isPopular ? '0 8px 16px rgba(0,0,0,0.15)' : '0 4px 6px rgba(0,0,0,0.1)'}';">">
+              <div style="padding: 2.5rem; border-radius: 1rem; background: white; box-shadow: ${boxShadow}; border: ${border}; transition: transform 0.3s, box-shadow 0.3s; position: relative;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='${boxShadowHover}';" onmouseout="this.style.transform=''; this.style.boxShadow='${boxShadow}';">
                 ${isPopular ? `<div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: white; padding: 0.25rem 1rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 600;">Most Popular</div>` : ''}
                 <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">${plan.name || plan.title || 'Plan'}</h3>
                 <div style="margin-bottom: 1.5rem;">
@@ -358,7 +364,7 @@ export class HTMLGenerator {
                 <ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
                   ${(plan.features || plan.items || []).map((feature: string) => `<li style="padding: 0.5rem 0; color: #4b5563;"><span style="color: #10b981; margin-right: 0.5rem;">✓</span>${feature}</li>`).join('')}
                 </ul>
-                <a href="${plan.ctaLink || '#'}" class="btn" style="display: block; text-align: center; background-color: ${isPopular ? '#3b82f6' : '#6b7280'}; color: white; padding: 0.875rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='${isPopular ? '#2563eb' : '#4b5563}'" onmouseout="this.style.backgroundColor='${isPopular ? '#3b82f6' : '#6b7280}'">${plan.ctaText || plan.buttonText || 'Get Started'}</a>
+                <a href="${plan.ctaLink || '#'}" class="btn" style="display: block; text-align: center; background-color: ${bgColor}; color: white; padding: 0.875rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='${bgColorHover}';" onmouseout="this.style.backgroundColor='${bgColor}';">${plan.ctaText || plan.buttonText || 'Get Started'}</a>
               </div>
             `;
                 }
