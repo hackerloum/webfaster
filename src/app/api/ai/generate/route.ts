@@ -37,12 +37,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     console.error('Generation error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate website';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    // Log detailed error for debugging
+    if (errorStack) {
+      console.error('Error stack:', errorStack);
+    }
+    
     return NextResponse.json<APIResponse<never>>(
       {
         success: false,
         error: {
           code: 'GENERATION_FAILED',
-          message: error instanceof Error ? error.message : 'Failed to generate website',
+          message: process.env.NODE_ENV === 'development' ? errorMessage : 'Failed to generate website. Please try again with a more detailed description.',
         },
       },
       { status: 500 }

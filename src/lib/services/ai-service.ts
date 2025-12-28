@@ -315,12 +315,13 @@ Generate the complete website structure as JSON now.`;
 
       const client = getOpenAIClient();
       
-      // Use gpt-4o as default (most reliable and latest model)
+      // Use gpt-4o as default, with fallback to gpt-4-turbo-preview
       // Valid models: gpt-4o, gpt-4o-mini, gpt-4-turbo-preview, gpt-4-0125-preview
-      const model = process.env.OPENAI_MODEL || 'gpt-4o';
+      const primaryModel = process.env.OPENAI_MODEL || 'gpt-4o';
+      const fallbackModel = 'gpt-4-turbo-preview';
       
       const requestConfig: any = {
-        model: model,
+        model: primaryModel,
         messages: [
           { role: 'system', content: this.buildSystemPrompt() },
           { role: 'user', content: enhancedPrompt },
@@ -332,7 +333,19 @@ Generate the complete website structure as JSON now.`;
       // Note: Not using JSON mode to avoid compatibility issues
       // We'll parse JSON from the response text instead (more reliable)
       
-      const response = await client.chat.completions.create(requestConfig);
+      let response;
+      try {
+        response = await client.chat.completions.create(requestConfig);
+      } catch (modelError: any) {
+        // If primary model fails, try fallback
+        if (modelError?.code === 'model_not_found' || modelError?.message?.includes('model')) {
+          console.warn(`Model ${primaryModel} not available, trying ${fallbackModel}`);
+          requestConfig.model = fallbackModel;
+          response = await client.chat.completions.create(requestConfig);
+        } else {
+          throw modelError;
+        }
+      }
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
