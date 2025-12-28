@@ -48,10 +48,19 @@ export async function POST(request: NextRequest) {
 
     // Find user (include password for verification)
     const { data: user, error: fetchError } = await supabase
-      .from('"User"')
-      .select('id, email, name, password, image, "createdAt"')
+      .from('User')
+      .select('id, email, name, password, image, createdAt')
       .eq('email', email)
       .maybeSingle();
+    
+    if (fetchError) {
+      console.error('Supabase fetch error:', {
+        code: fetchError.code,
+        message: fetchError.message,
+        details: fetchError.details,
+        hint: fetchError.hint,
+      });
+    }
 
     if (fetchError || !user) {
       return NextResponse.json(

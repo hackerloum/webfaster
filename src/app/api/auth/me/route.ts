@@ -25,10 +25,19 @@ export async function GET() {
     }
 
     const { data: user, error: fetchError } = await supabase
-      .from('"User"')
-      .select('id, email, name, image, "emailVerified", "createdAt", "updatedAt"')
+      .from('User')
+      .select('id, email, name, image, emailVerified, createdAt, updatedAt')
       .eq('id', currentUser.userId)
       .maybeSingle();
+    
+    if (fetchError) {
+      console.error('Supabase fetch error:', {
+        code: fetchError.code,
+        message: fetchError.message,
+        details: fetchError.details,
+        hint: fetchError.hint,
+      });
+    }
 
     if (fetchError || !user) {
       return NextResponse.json(

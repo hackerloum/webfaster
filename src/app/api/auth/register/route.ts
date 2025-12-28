@@ -48,11 +48,16 @@ export async function POST(request: NextRequest) {
     const { name, email, password } = registerSchema.parse(body);
 
     // Check if user already exists
-    const { data: existingUser } = await supabase
-      .from('"User"')
+    // Try both quoted and unquoted table names (Supabase may normalize)
+    const { data: existingUser, error: checkError } = await supabase
+      .from('User')
       .select('id, email')
       .eq('email', email)
       .maybeSingle();
+    
+    if (checkError && !checkError.message.includes('relation') && !checkError.message.includes('does not exist')) {
+      console.error('Error checking existing user:', checkError);
+    }
 
     if (existingUser) {
       return NextResponse.json(
@@ -68,15 +73,16 @@ export async function POST(request: NextRequest) {
     const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     // Create user
+    // Try using 'User' without quotes first (Supabase may normalize table names)
     const { data: user, error: insertError } = await supabase
-      .from('"User"')
+      .from('User')
       .insert({
         id: userId,
         name,
         email,
         password: hashedPassword,
       })
-      .select('id, email, name, image, "createdAt"')
+      .select('id, email, name, image, createdAt')
       .single();
 
     if (insertError) {
@@ -87,13 +93,27 @@ export async function POST(request: NextRequest) {
         hint: insertError.hint,
       });
       
-      if (insertError.code === '23505') { // Unique constraint violation
+      // Return the actual error to help debug
+      if (insertError.code === '23505' || insertError.message.includes('duplicate') || insertError.message.includes('unique')) {
         return NextResponse.json(
           { success: false, error: { code: 'USER_EXISTS', message: 'User with this email already exists' } },
           { status: 400 }
         );
       }
-      throw insertError;
+      
+      // Return detailed error for debugging
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'SUPABASE_ERROR',
+            message: insertError.message || 'Database error',
+            details: insertError.details,
+            hint: insertError.hint,
+          },
+        },
+        { status: 500 }
+      );
     }
 
     if (!user) {
@@ -145,14 +165,19 @@ export async function POST(request: NextRequest) {
     
     // Provide more specific error messages
     let errorMessage = 'Failed to create account. Please try again.';
+    let errorCode = 'REGISTRATION_FAILED';
+    
     if (error instanceof Error) {
       if (error.message.includes('Unique constraint') || error.message.includes('duplicate')) {
         errorMessage = 'An account with this email already exists.';
+        errorCode = 'USER_EXISTS';
       } else if (error.message.includes('connect') || error.message.includes('database')) {
         errorMessage = 'Database connection error. Please check your database configuration.';
       } else if (error.message.includes('relation') || error.message.includes('does not exist')) {
-        errorMessage = 'Database table not found. Please ensure the User table exists in your Supabase database.';
+        errorMessage = 'Database table not found. Please ensure the User table exists in your Supabase database. Run the SQL schema in Supabase SQL Editor.';
+        errorCode = 'TABLE_NOT_FOUND';
       } else {
+        // Return the actual error message for debugging
         errorMessage = error.message;
       }
     }
@@ -161,7 +186,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: {
-          code: 'REGISTRATION_FAILED',
+          code: errorCode,
           message: errorMessage,
         },
       },
