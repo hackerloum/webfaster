@@ -28,6 +28,8 @@ export function useProject(projectId: string | null) {
     if (projectId && projectId !== currentWebsite?.id) {
       loadProject(projectId);
     }
+    // Zustand selectors are stable, so setWebsite doesn't need to be in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, currentWebsite?.id, loadProject]);
 
   return { isLoading, error, website: currentWebsite };
