@@ -11,6 +11,24 @@ import { SectionNavigator } from '@/components/editor/section-navigator';
 import { useProject } from '@/lib/hooks/use-project';
 import { Loader2 } from 'lucide-react';
 
+function EditorPanel() {
+  const selectSection = useEditorStore((state) => state.selectSection);
+  
+  return (
+    <>
+      {/* Mobile overlay backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/50 z-40 md:hidden"
+        onClick={() => selectSection(null)}
+      />
+      {/* Editor panel */}
+      <div className="fixed md:relative bottom-0 md:bottom-auto left-0 right-0 md:left-auto md:right-auto md:w-[420px] h-[70vh] md:h-auto bg-[#111118] border-t md:border-l md:border-t-0 border-white/10 overflow-y-auto custom-scrollbar flex-shrink-0 z-50 md:z-auto rounded-t-2xl md:rounded-none">
+        <SectionEditor />
+      </div>
+    </>
+  );
+}
+
 export default function EditorPage() {
   const params = useParams();
   const router = useRouter();
@@ -117,17 +135,7 @@ export default function EditorPage() {
 
           {/* Editor Panel - Sidebar on desktop, bottom sheet on mobile */}
           {selectedSectionId && (
-            <>
-              {/* Mobile overlay backdrop */}
-              <div 
-                className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                onClick={() => useEditorStore.getState().selectSection(null)}
-              />
-              {/* Editor panel */}
-              <div className="fixed md:relative bottom-0 md:bottom-auto left-0 right-0 md:left-auto md:right-auto md:w-[420px] h-[70vh] md:h-auto bg-[#111118] border-t md:border-l md:border-t-0 border-white/10 overflow-y-auto custom-scrollbar flex-shrink-0 z-50 md:z-auto rounded-t-2xl md:rounded-none">
-                <SectionEditor />
-              </div>
-            </>
+            <EditorPanel />
           )}
         </div>
       </div>
