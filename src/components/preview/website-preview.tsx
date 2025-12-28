@@ -17,12 +17,12 @@ export function WebsitePreview() {
       const generator = new HTMLGenerator();
       const generatedHTML = generator.generateFullHTML(currentWebsite);
       setHtml(generatedHTML);
-      // Force iframe to reload by updating srcDoc
+      // Force iframe to reload by updating srcdoc
       if (iframeRef.current) {
         // Small delay to ensure state is updated
         setTimeout(() => {
           if (iframeRef.current) {
-            iframeRef.current.srcDoc = generatedHTML;
+            iframeRef.current.setAttribute('srcdoc', generatedHTML);
           }
         }, 0);
       }
