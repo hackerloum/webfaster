@@ -88,17 +88,111 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const website = body as WebsiteStructure;
+    // Get authenticated user
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth-token')?.value;
 
-    // In production, save to database
-    const response: APIResponse<WebsiteStructure> = {
+    if (!token) {
+      return NextResponse.json<APIResponse<never>>(
+        {
+          success: false,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Not authenticated',
+          },
+        },
+        { status: 401 }
+      );
+    }
+
+    const currentUser = verifyToken(token);
+    if (!currentUser) {
+      return NextResponse.json<APIResponse<never>>(
+        {
+          success: false,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Invalid token',
+          },
+        },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { title, description, data } = body;
+
+    if (!title || typeof title !== 'string') {
+      return NextResponse.json<APIResponse<never>>(
+        {
+          success: false,
+          error: {
+            code: 'INVALID_INPUT',
+            message: 'Title is required',
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json<APIResponse<never>>(
+        {
+          success: false,
+          error: {
+            code: 'INVALID_INPUT',
+            message: 'Project data is required',
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    // Generate a unique ID (cuid-like format)
+    const projectId = `project_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Save project to database
+    const { data: project, error } = await supabase
+      .from('Project')
+      .insert({
+        id: projectId,
+        userId: currentUser.userId,
+        title,
+        description: description || null,
+        data: data as WebsiteStructure,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving project:', error);
+      return NextResponse.json<APIResponse<never>>(
+        {
+          success: false,
+          error: {
+            code: 'SAVE_FAILED',
+            message: 'Failed to save project',
+          },
+        },
+        { status: 500 }
+      );
+    }
+
+    const response: APIResponse<{
+      id: string;
+      title: string;
+      description: string | null;
+      data: WebsiteStructure;
+      createdAt: string;
+      updatedAt: string;
+    }> = {
       success: true,
-      data: website,
+      data: project,
     };
 
     return NextResponse.json(response, { status: 201 });
   } catch (error) {
+    console.error('Save project error:', error);
     return NextResponse.json<APIResponse<never>>(
       {
         success: false,

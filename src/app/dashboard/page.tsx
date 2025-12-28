@@ -284,7 +284,10 @@ export default function DashboardPage() {
               </div>
               <Button
                 size="lg"
-                onClick={() => router.push('/')}
+                onClick={() => {
+                  // Navigate to homepage and trigger generator
+                  router.push('/?generate=true');
+                }}
                 className="bg-white text-black hover:bg-white/90 font-semibold h-12 sm:h-14 px-6 sm:px-8 w-full sm:w-auto"
               >
                 <Plus className="w-5 h-5 mr-2" />
@@ -401,7 +404,7 @@ export default function DashboardPage() {
                 <p className="text-white/60 mb-6">Create your first website to get started</p>
                 <Button
                   size="lg"
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/?generate=true')}
                   className="bg-white text-black hover:bg-white/90 font-semibold"
                 >
                   <Plus className="w-5 h-5 mr-2" />
