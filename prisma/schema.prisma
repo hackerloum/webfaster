@@ -18,6 +18,7 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   name          String?
+  password      String?   // Hashed password (nullable for OAuth users)
   image         String?
   emailVerified DateTime?
   createdAt     DateTime  @default(now())

@@ -14,6 +14,7 @@ interface GeneratorInterfaceProps {
 export function GeneratorInterface({ onGenerate }: GeneratorInterfaceProps) {
   const { prompt, setPrompt, isGenerating, progress } = useGenerationStore();
   const [localPrompt, setLocalPrompt] = useState('');
+  const headlineText = "We'll Build It";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +41,7 @@ export function GeneratorInterface({ onGenerate }: GeneratorInterfaceProps) {
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Describe Your Website,
             <br />
-            We&apos;ll Build It
+            {headlineText}
           </h1>
 
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">

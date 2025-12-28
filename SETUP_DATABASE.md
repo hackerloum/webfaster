@@ -63,8 +63,9 @@ Your database has 2 tables:
 
 ### `User` Table
 - `id` (Text, Primary Key) - Unique user identifier
-- `email` (Text, Unique) - User's email address
-- `name` (Text, Optional) - User's name
+- `email` (Text, Unique) - User's email address (for login)
+- `name` (Text, Optional) - User's display name
+- `password` (Text, Optional) - Hashed password for authentication (nullable for OAuth users)
 - `image` (Text, Optional) - User's profile image URL
 - `emailVerified` (Timestamp, Optional) - Email verification date
 - `createdAt` (Timestamp) - Account creation date
