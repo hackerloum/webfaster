@@ -339,23 +339,41 @@ export default function DashboardPage() {
           >
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Quick Actions</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-              {quickActions.map((action, index) => (
-                <Link
-                  key={index}
-                  href={action.href}
-                  className="group bg-white/[0.02] border border-white/[0.05] rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/[0.04] transition-all"
-                >
-                  <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${action.color} mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
-                    <action.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                  </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">{action.title}</h3>
-                  <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">{action.description}</p>
-                  <div className="flex items-center text-purple-400 text-xs sm:text-sm font-medium group-hover:gap-2 transition-all">
-                    <span>Get started</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Component>
-              )})}
+              {quickActions.map((action, index) => 
+                action.onClick ? (
+                  <button
+                    key={index}
+                    onClick={action.onClick}
+                    className="group bg-white/[0.02] border border-white/[0.05] rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/[0.04] transition-all w-full text-left"
+                  >
+                    <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${action.color} mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
+                      <action.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">{action.title}</h3>
+                    <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">{action.description}</p>
+                    <div className="flex items-center text-purple-400 text-xs sm:text-sm font-medium group-hover:gap-2 transition-all">
+                      <span>Get started</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </button>
+                ) : (
+                  <Link
+                    key={index}
+                    href={action.href}
+                    className="group bg-white/[0.02] border border-white/[0.05] rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/[0.04] transition-all"
+                  >
+                    <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${action.color} mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
+                      <action.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">{action.title}</h3>
+                    <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4">{action.description}</p>
+                    <div className="flex items-center text-purple-400 text-xs sm:text-sm font-medium group-hover:gap-2 transition-all">
+                      <span>Get started</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+                )
+              )}
             </div>
           </motion.div>
 
