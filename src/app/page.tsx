@@ -13,16 +13,14 @@ export default function HomePage() {
   const setWebsite = useWebsiteStore((state) => state.setWebsite);
   const { setGenerating, setProgress, setError } = useGenerationStore();
   const [showGenerator, setShowGenerator] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Check if we should show generator from URL params
+  // Check if we should show generator from URL params (client-side only)
   useEffect(() => {
+    setMounted(true);
     const params = new URLSearchParams(window.location.search);
     if (params.get('generate') === 'true') {
       setShowGenerator(true);
-      setTimeout(() => {
-        const element = document.getElementById('generator');
-        element?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
     }
   }, []);
 
@@ -130,6 +128,11 @@ export default function HomePage() {
       setProgress(null);
     }
   };
+
+  // Prevent hydration mismatch by showing landing page on server
+  if (!mounted) {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
 
   return (
     <>
