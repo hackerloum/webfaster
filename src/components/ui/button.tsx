@@ -36,17 +36,13 @@ export interface ButtonProps
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, isLoading, leftIcon, rightIcon, children, disabled, ...props }, ref) => {
-    return (
-      <button
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        disabled={disabled || isLoading}
-        {...props}
-      >
+  ({ className, variant, size, isLoading, leftIcon, rightIcon, children, disabled, asChild, ...props }, ref) => {
+    const buttonContent = (
+      <>
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
@@ -54,6 +50,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {children}
         {!isLoading && rightIcon && <span className="inline-flex">{rightIcon}</span>}
+      </>
+    );
+
+    const buttonClasses = cn(buttonVariants({ variant, size, className }));
+
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(children as React.ReactElement<any>, {
+        className: cn(buttonClasses, (children as React.ReactElement<any>).props.className),
+        disabled: disabled || isLoading,
+        ...props,
+        children: buttonContent,
+      });
+    }
+
+    return (
+      <button
+        className={buttonClasses}
+        ref={ref}
+        disabled={disabled || isLoading}
+        {...props}
+      >
+        {buttonContent}
       </button>
     );
   }
