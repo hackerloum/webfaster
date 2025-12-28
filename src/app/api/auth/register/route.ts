@@ -64,10 +64,14 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await hashPassword(password);
 
+    // Generate user ID (using cuid-like format)
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
     // Create user
     const { data: user, error: insertError } = await supabase
       .from('"User"')
       .insert({
+        id: userId,
         name,
         email,
         password: hashedPassword,
@@ -76,6 +80,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
+      console.error('Supabase insert error:', {
+        code: insertError.code,
+        message: insertError.message,
+        details: insertError.details,
+        hint: insertError.hint,
+      });
+      
       if (insertError.code === '23505') { // Unique constraint violation
         return NextResponse.json(
           { success: false, error: { code: 'USER_EXISTS', message: 'User with this email already exists' } },
@@ -125,6 +136,13 @@ export async function POST(request: NextRequest) {
 
     console.error('Registration error:', error);
     
+    // Log full error details for debugging
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
     // Provide more specific error messages
     let errorMessage = 'Failed to create account. Please try again.';
     if (error instanceof Error) {
@@ -132,6 +150,8 @@ export async function POST(request: NextRequest) {
         errorMessage = 'An account with this email already exists.';
       } else if (error.message.includes('connect') || error.message.includes('database')) {
         errorMessage = 'Database connection error. Please check your database configuration.';
+      } else if (error.message.includes('relation') || error.message.includes('does not exist')) {
+        errorMessage = 'Database table not found. Please ensure the User table exists in your Supabase database.';
       } else {
         errorMessage = error.message;
       }
