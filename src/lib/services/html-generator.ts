@@ -305,19 +305,66 @@ export class HTMLGenerator {
   private generateInteractivityScript(): string {
     return `
       document.addEventListener('DOMContentLoaded', function() {
+        // Prevent all link navigation
+        document.querySelectorAll('a').forEach(function(link) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            // If it's a hash link, just scroll within the page
+            if (link.getAttribute('href') && link.getAttribute('href').startsWith('#')) {
+              const targetId = link.getAttribute('href').substring(1);
+              const targetElement = document.getElementById(targetId);
+              if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+            return false;
+          });
+          // Make links look clickable but non-functional
+          link.style.cursor = 'pointer';
+        });
+
+        // Prevent all form submissions
+        document.querySelectorAll('form').forEach(function(form) {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('Form submission is disabled in preview mode.');
+            return false;
+          });
+        });
+
+        // Prevent button navigation (if buttons have onclick that navigates)
+        document.querySelectorAll('button').forEach(function(button) {
+          button.addEventListener('click', function(e) {
+            // Only prevent if it's a link button or has navigation
+            if (button.getAttribute('onclick') && button.getAttribute('onclick').includes('window.location')) {
+              e.preventDefault();
+              e.stopPropagation();
+              return false;
+            }
+          });
+        });
+
+        // Section selection for editor
         document.querySelectorAll('[data-section-id]').forEach(function(section) {
           section.addEventListener('click', function(e) {
-            window.parent.postMessage({
-              type: 'section-clicked',
-              sectionId: section.getAttribute('data-section-id')
-            }, '*');
+            // Only send message if clicking on the section itself, not on interactive elements
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && !e.target.closest('a') && !e.target.closest('button') && !e.target.closest('form')) {
+              window.parent.postMessage({
+                type: 'section-clicked',
+                sectionId: section.getAttribute('data-section-id')
+              }, '*');
+            }
           });
           
-          section.addEventListener('mouseenter', function() {
-            window.parent.postMessage({
-              type: 'section-hovered',
-              sectionId: section.getAttribute('data-section-id')
-            }, '*');
+          section.addEventListener('mouseenter', function(e) {
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON' && !e.target.closest('a') && !e.target.closest('button')) {
+              window.parent.postMessage({
+                type: 'section-hovered',
+                sectionId: section.getAttribute('data-section-id')
+              }, '*');
+            }
           });
           
           section.addEventListener('mouseleave', function() {
@@ -326,6 +373,18 @@ export class HTMLGenerator {
               sectionId: null
             }, '*');
           });
+        });
+
+        // Prevent any window.location changes
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...window.location,
+            href: window.location.href,
+            assign: function() { console.log('Navigation blocked in preview mode'); },
+            replace: function() { console.log('Navigation blocked in preview mode'); },
+            reload: function() { console.log('Navigation blocked in preview mode'); }
+          },
+          writable: false
         });
       });
     `;

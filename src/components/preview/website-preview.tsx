@@ -66,8 +66,24 @@ export function WebsitePreview() {
             ref={iframeRef}
             srcDoc={html}
             className="w-full h-full border-0"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-same-origin allow-forms"
             title="Website Preview"
+            onLoad={() => {
+              // Additional safety: prevent navigation attempts
+              try {
+                const iframe = iframeRef.current;
+                if (iframe?.contentWindow) {
+                  // Override navigation methods in iframe
+                  iframe.contentWindow.addEventListener('beforeunload', (e) => {
+                    e.preventDefault();
+                    return false;
+                  });
+                }
+              } catch (error) {
+                // Cross-origin restrictions may prevent this, which is fine
+                console.log('Cannot access iframe content (expected in some cases)');
+              }
+            }}
           />
         </div>
       </div>
