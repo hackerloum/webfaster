@@ -315,12 +315,9 @@ Generate the complete website structure as JSON now.`;
 
       const client = getOpenAIClient();
       
-      // Use gpt-4-turbo or gpt-4o for better results, fallback to gpt-4
-      // Note: gpt-4-turbo-preview might not exist, use gpt-4-turbo or gpt-4o
-      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo';
-      
-      // Models that support JSON mode (gpt-4-turbo and newer)
-      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-1106-preview'].includes(model);
+      // Use gpt-4o as default (most reliable and latest model)
+      // Valid models: gpt-4o, gpt-4o-mini, gpt-4-turbo-preview, gpt-4-0125-preview
+      const model = process.env.OPENAI_MODEL || 'gpt-4o';
       
       const requestConfig: any = {
         model: model,
@@ -328,18 +325,12 @@ Generate the complete website structure as JSON now.`;
           { role: 'system', content: this.buildSystemPrompt() },
           { role: 'user', content: enhancedPrompt },
         ],
-        temperature: 0.8, // Slightly higher for more creativity
+        temperature: 0.7, // Balanced for creativity and consistency
         max_tokens: 6000, // Increased for more detailed responses
       };
-
-      // Add JSON mode if supported
-      // Note: When using JSON mode, OpenAI requires the prompt to explicitly request JSON output
-      if (supportsJsonMode) {
-        requestConfig.response_format = { type: 'json_object' };
-        enhancedPrompt += '\n\nIMPORTANT: Respond with ONLY valid JSON. Do not include markdown code blocks, explanations, or any text outside the JSON object. Return pure JSON starting with { and ending with }.';
-        // Update the user message with the enhanced prompt
-        requestConfig.messages[1].content = enhancedPrompt;
-      }
+      
+      // Note: Not using JSON mode to avoid compatibility issues
+      // We'll parse JSON from the response text instead (more reliable)
       
       const response = await client.chat.completions.create(requestConfig);
 
