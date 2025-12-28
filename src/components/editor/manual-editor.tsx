@@ -615,7 +615,7 @@ export function ManualEditor({ section }: ManualEditorProps) {
                   
                   {((editedContent.testimonials || editedContent.items || []) as any[]).length === 0 && (
                     <div className="text-center py-8 text-white/40 text-sm">
-                      No testimonials yet. Click "Add Testimonial" to add one.
+                      No testimonials yet. Click &quot;Add Testimonial&quot; to add one.
                     </div>
                   )}
                 </div>
