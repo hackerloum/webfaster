@@ -193,21 +193,27 @@ export default function DashboardPage() {
       description: 'Create a website from text prompt',
       icon: Sparkles,
       color: 'from-purple-400 to-purple-600',
-      href: '/',
+      href: '/?generate=true',
     },
     {
-      title: 'Browse Templates',
-      description: 'Start from a pre-built template',
+      title: 'Browse Projects',
+      description: 'View all your projects',
       icon: FolderOpen,
       color: 'from-blue-400 to-blue-600',
-      href: '/templates',
+      href: '#projects', // Scroll to projects section
+      onClick: () => {
+        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+      },
     },
     {
-      title: 'View Analytics',
-      description: 'Track your website performance',
+      title: 'Dashboard Stats',
+      description: 'View your statistics',
       icon: BarChart3,
       color: 'from-pink-400 to-pink-600',
-      href: '/analytics',
+      href: '#', // Already on dashboard
+      onClick: () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
     },
   ];
 
@@ -348,13 +354,14 @@ export default function DashboardPage() {
                     <span>Get started</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
-                </Link>
-              ))}
+                </Component>
+              )})}
             </div>
           </motion.div>
 
           {/* Projects Section */}
           <motion.div
+            id="projects"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}

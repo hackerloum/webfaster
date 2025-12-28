@@ -316,10 +316,11 @@ Generate the complete website structure as JSON now.`;
       const client = getOpenAIClient();
       
       // Use gpt-4-turbo or gpt-4o for better results, fallback to gpt-4
-      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo-preview';
+      // Note: gpt-4-turbo-preview might not exist, use gpt-4-turbo or gpt-4o
+      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo';
       
-      // Models that support JSON mode
-      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
+      // Models that support JSON mode (gpt-4-turbo and newer)
+      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-1106-preview'].includes(model);
       
       const requestConfig: any = {
         model: model,
@@ -398,8 +399,8 @@ User instruction: ${instruction}
 Return the modified section as JSON matching the original structure.`;
 
       const client = getOpenAIClient();
-      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo-preview';
-      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
+      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo';
+      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-1106-preview'].includes(model);
       
       const requestConfig: any = {
         model: model,
@@ -450,8 +451,8 @@ Return the modified section as JSON matching the original structure.`;
   async suggestImprovements(section: Section): Promise<string[]> {
     try {
       const client = getOpenAIClient();
-      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo-preview';
-      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
+      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo';
+      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-1106-preview'].includes(model);
       
       const requestConfig: any = {
         model: model,
