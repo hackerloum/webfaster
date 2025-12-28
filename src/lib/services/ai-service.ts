@@ -66,15 +66,25 @@ CONTENT GUIDELINES:
 - Make content scannable with bullet points, short paragraphs, and clear sections
 
 IMAGE REQUIREMENTS:
-- ALWAYS include images in hero sections (use high-quality placeholder URLs)
-- Use descriptive placeholder image URLs like: "https://images.unsplash.com/photo-[ID]?w=1200&h=600&fit=crop" or "https://via.placeholder.com/1200x600/[COLOR]/ffffff?text=[DESCRIPTION]"
-- For hero sections: Include backgroundImage in content (e.g., "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop")
-- For feature sections: Include image URLs for each feature
-- For about sections: Include team/company images
-- For gallery sections: Include multiple image URLs
-- Images should be contextually relevant (e.g., tech images for tech companies, food images for restaurants)
-- Use Unsplash or similar high-quality placeholder services
+- ALWAYS include images in hero sections (use high-quality, verified working URLs)
+- Use ONLY these verified Unsplash image URLs (they are guaranteed to work):
+  * Tech/Business: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"
+  * Business/Office: "https://images.unsplash.com/photo-1497366216548-37526070097c?w=1920&h=1080&fit=crop"
+  * Modern Workspace: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1920&h=1080&fit=crop"
+  * Food/Restaurant: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1920&h=1080&fit=crop"
+  * Nature/Outdoor: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&h=1080&fit=crop"
+  * Fashion/Style: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&h=1080&fit=crop"
+  * Healthcare/Medical: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=1920&h=1080&fit=crop"
+  * Education: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&h=1080&fit=crop"
+  * Creative/Design: "https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=1920&h=1080&fit=crop"
+  * Fitness/Sports: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920&h=1080&fit=crop"
+- For feature sections: Use smaller versions (w=800&h=600) of the above URLs
+- For about sections: Use portrait-oriented images (w=800&h=1000)
+- For gallery sections: Use multiple verified Unsplash URLs
+- NEVER use placeholder.com or via.placeholder.com - they are unreliable
+- NEVER make up photo IDs - only use the verified URLs above
 - Always set imageAlt text for accessibility
+- Choose the most contextually relevant image from the list above
 
 SECTION TYPES & BEST PRACTICES:
 
@@ -82,18 +92,19 @@ SECTION TYPES & BEST PRACTICES:
 - Large, attention-grabbing headline (8-12 words max)
 - Compelling subheadline that explains value proposition
 - Clear primary CTA button
-- MUST include: backgroundImage in content (high-quality image URL)
+- MUST include: backgroundImage in content (use ONLY verified URLs from the IMAGE REQUIREMENTS list above)
 - Optional: Secondary CTA, overlay gradient for text readability
 - Background: Use backgroundImage with optional gradient overlay
 - Height: Full viewport or substantial (80-100vh on desktop)
-- Example image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop" for tech/business
+- Example: For tech/business use "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"
 
 **Features Section:**
 - 3-6 feature cards with icons/illustrations
 - Each feature: Icon/image URL, title (3-5 words), description (1-2 sentences)
-- Include image URLs for each feature (e.g., "https://images.unsplash.com/photo-[ID]?w=400&h=300&fit=crop")
+- Include image URLs for each feature using verified Unsplash URLs (use w=800&h=600 for feature images)
 - Grid layout: 3 columns on desktop, 2 on tablet, 1 on mobile
 - Use consistent card styling with hover effects, shadows, and rounded corners
+- Example feature images: Use variations of the verified URLs from IMAGE REQUIREMENTS with w=800&h=600
 
 **About Section:**
 - Company/person story (2-3 paragraphs)
@@ -430,13 +441,23 @@ CRITICAL RULES:
 - The styles object must maintain its structure (e.g., if it has "backgroundColor", "padding", etc., keep those keys)
 
 IMAGE HANDLING (CRITICAL):
-- For hero sections: If user asks to add an image, add "backgroundImage" to the content object with a valid Unsplash URL
-- Example hero image URL: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"
+- For hero sections: If user asks to add an image, add "backgroundImage" to the content object with a VERIFIED Unsplash URL
+- Use ONLY these verified URLs (they are guaranteed to work):
+  * Tech/Business: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"
+  * Business/Office: "https://images.unsplash.com/photo-1497366216548-37526070097c?w=1920&h=1080&fit=crop"
+  * Modern Workspace: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1920&h=1080&fit=crop"
+  * Food/Restaurant: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1920&h=1080&fit=crop"
+  * Nature/Outdoor: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&h=1080&fit=crop"
+  * Fashion/Style: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&h=1080&fit=crop"
+  * Healthcare/Medical: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=1920&h=1080&fit=crop"
+  * Education: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&h=1080&fit=crop"
+  * Creative/Design: "https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=1920&h=1080&fit=crop"
+  * Fitness/Sports: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920&h=1080&fit=crop"
 - For hero sections, you can also add "image" or "imageAlt" fields if needed
-- For feature sections: Add "image" or "icon" to each feature object
-- For about sections: Add "image" to the content object
-- Always use real, high-quality image URLs from Unsplash or similar services
-- Image URLs should be contextually relevant to the section content
+- For feature sections: Add "image" to each feature object (use w=800&h=600 versions of the above URLs)
+- For about sections: Add "image" to the content object (use w=800&h=1000 for portraits)
+- NEVER make up photo IDs or use unverified URLs
+- Choose the most contextually relevant image from the verified list above
 
 OUTPUT FORMAT:
 Return the complete section object with ALL fields, including:

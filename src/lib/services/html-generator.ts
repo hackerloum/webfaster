@@ -186,6 +186,9 @@ export class HTMLGenerator {
     const backgroundImage = content.backgroundImage || content.image;
     const imageAlt = content.imageAlt || content.alt || 'Hero image';
     
+    // Fallback image if the provided one fails
+    const fallbackImage = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop';
+    
     // If there's a background image, add overlay for text readability
     const backgroundStyle = hasBackgroundImage 
       ? `background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${backgroundImage}); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 80vh; display: flex; align-items: center;`
@@ -193,8 +196,25 @@ export class HTMLGenerator {
     
     const textColor = hasBackgroundImage ? 'color: white;' : '';
     
+    // Add error handling script for broken images
+    const imageErrorHandler = hasBackgroundImage ? `
+      <script>
+        (function() {
+          var img = new Image();
+          img.onerror = function() {
+            var section = document.querySelector('[data-section-id="${section.id}"]');
+            if (section) {
+              section.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${fallbackImage})';
+            }
+          };
+          img.src = '${backgroundImage}';
+        })();
+      </script>
+    ` : '';
+    
     return `
       <section data-section-id="${section.id}" style="${styles} ${backgroundStyle}">
+        ${imageErrorHandler}
         <div class="container" style="text-align: center; padding: 5rem 1rem; width: 100%; ${textColor}">
           <h1 style="${textColor} text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${content.heading || 'Welcome'}</h1>
           <p style="font-size: 1.25rem; margin-bottom: 2rem; ${textColor} text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${content.subheading || ''}</p>
@@ -234,7 +254,7 @@ export class HTMLGenerator {
                   const imageUrl = feature.image || feature.icon;
                   return `
               <div style="padding: 2rem; border-radius: 1rem; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';">
-                ${hasImage ? `<img src="${imageUrl}" alt="${feature.imageAlt || feature.title || 'Feature'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1.5rem;" />` : ''}
+                ${hasImage ? `<img src="${imageUrl}" alt="${feature.imageAlt || feature.title || 'Feature'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1.5rem;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop';" />` : ''}
                 ${feature.icon ? `<div style="font-size: 3rem; margin-bottom: 1rem; text-align: center;">${feature.icon}</div>` : ''}
                 <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937;">${feature.title || ''}</h3>
                 <p style="color: #6b7280; line-height: 1.6;">${feature.description || ''}</p>
@@ -261,7 +281,7 @@ export class HTMLGenerator {
           <div style="display: grid; grid-template-columns: ${hasImage ? '1fr 1fr' : '1fr'}; gap: 3rem; align-items: center;">
             ${hasImage ? `
             <div>
-              <img src="${imageUrl}" alt="${imageAlt}" style="width: 100%; height: auto; border-radius: 1rem; box-shadow: 0 8px 16px rgba(0,0,0,0.1);" />
+              <img src="${imageUrl}" alt="${imageAlt}" style="width: 100%; height: auto; border-radius: 1rem; box-shadow: 0 8px 16px rgba(0,0,0,0.1);" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1497366216548-37526070097c?w=800&h=1000&fit=crop';" />
             </div>
             ` : ''}
             <div>
@@ -318,7 +338,7 @@ export class HTMLGenerator {
                 (service: any) => `
               <div style="padding: 2.5rem; border-radius: 1rem; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';">
                 ${service.icon ? `<div style="font-size: 3rem; margin-bottom: 1rem; text-align: center;">${service.icon}</div>` : ''}
-                ${service.image ? `<img src="${service.image}" alt="${service.imageAlt || service.title || 'Service'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1.5rem;" />` : ''}
+                ${service.image ? `<img src="${service.image}" alt="${service.imageAlt || service.title || 'Service'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1.5rem;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop';" />` : ''}
                 <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937;">${service.title || service.name || 'Service'}</h3>
                 <p style="color: #6b7280; line-height: 1.6; margin-bottom: 1rem;">${service.description || ''}</p>
                 ${service.price ? `<p style="font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin-top: 1rem;">${service.price}</p>` : ''}
@@ -395,7 +415,7 @@ export class HTMLGenerator {
                 (testimonial: any) => `
               <div style="padding: 2rem; border-radius: 1rem; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-                  ${testimonial.avatar || testimonial.image ? `<img src="${testimonial.avatar || testimonial.image}" alt="${testimonial.name || 'Customer'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 1rem;" />` : ''}
+                  ${testimonial.avatar || testimonial.image ? `<img src="${testimonial.avatar || testimonial.image}" alt="${testimonial.name || 'Customer'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 1rem;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop';" />` : ''}
                   <div>
                     <h4 style="font-size: 1.125rem; font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">${testimonial.name || 'Customer'}</h4>
                     ${testimonial.role || testimonial.title ? `<p style="font-size: 0.875rem; color: #6b7280;">${testimonial.role || testimonial.title}</p>` : ''}
@@ -427,7 +447,7 @@ export class HTMLGenerator {
               .map(
                 (member: any) => `
               <div style="text-align: center; padding: 1.5rem; border-radius: 1rem; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)';" onmouseout="this.style.transform='';">
-                ${member.image || member.avatar ? `<img src="${member.image || member.avatar}" alt="${member.name || 'Team member'}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; display: block; border: 4px solid #e5e7eb;" />` : ''}
+                ${member.image || member.avatar ? `<img src="${member.image || member.avatar}" alt="${member.name || 'Team member'}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto 1rem; display: block; border: 4px solid #e5e7eb;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop';" />` : ''}
                 <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">${member.name || 'Team Member'}</h3>
                 ${member.role || member.title ? `<p style="font-size: 1rem; color: #3b82f6; margin-bottom: 0.5rem; font-weight: 500;">${member.role || member.title}</p>` : ''}
                 ${member.bio || member.description ? `<p style="font-size: 0.875rem; color: #6b7280; line-height: 1.5; margin-top: 0.5rem;">${member.bio || member.description}</p>` : ''}
@@ -477,7 +497,7 @@ export class HTMLGenerator {
                   const imageAlt = typeof image === 'string' ? 'Gallery image' : (image.alt || image.caption || 'Gallery image');
                   return `
               <div style="position: relative; overflow: hidden; border-radius: 0.5rem; aspect-ratio: 1; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='';">
-                <img src="${imageUrl}" alt="${imageAlt}" style="width: 100%; height: 100%; object-fit: cover;" />
+                <img src="${imageUrl}" alt="${imageAlt}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=800&fit=crop';" />
               </div>
             `;
                 }
@@ -525,7 +545,7 @@ export class HTMLGenerator {
           <div style="padding: 1.5rem; border-radius: 0.5rem; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             ${item.title ? `<h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; color: #1f2937;">${item.title}</h3>` : ''}
             ${item.description ? `<p style="color: #6b7280; line-height: 1.6;">${item.description}</p>` : ''}
-            ${item.image ? `<img src="${item.image}" alt="${item.imageAlt || item.title || 'Item'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-top: 1rem;" />` : ''}
+            ${item.image ? `<img src="${item.image}" alt="${item.imageAlt || item.title || 'Item'}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem; margin-top: 1rem;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop';" />` : ''}
           </div>
         `;
       });
