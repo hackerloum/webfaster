@@ -506,8 +506,8 @@ User instruction: ${instruction}
 IMPORTANT: Return the COMPLETE modified section as JSON. Include ALL fields (id, type, order, content, styles, visible). The id, type, and order must remain exactly the same. Only modify content and styles according to the instruction.`;
 
       const client = getOpenAIClient();
-      const model = process.env.OPENAI_MODEL || 'gpt-4o';
-      const supportsJsonMode = ['gpt-4-turbo-preview', 'gpt-4-0125-preview', 'gpt-4-1106-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
+      const model = process.env.OPENAI_MODEL || 'gpt-4.1';
+      const supportsJsonMode = ['gpt-4.1', 'gpt-5.2', 'gpt-4-turbo-preview', 'gpt-4-0125-preview', 'gpt-4-1106-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
       
       const requestConfig: any = {
         model: model,
@@ -631,8 +631,8 @@ IMPORTANT: Return the COMPLETE modified section as JSON. Include ALL fields (id,
   async suggestImprovements(section: Section): Promise<string[]> {
     try {
       const client = getOpenAIClient();
-      const model = process.env.OPENAI_MODEL || 'gpt-4o';
-      const supportsJsonMode = ['gpt-4-turbo-preview', 'gpt-4-0125-preview', 'gpt-4-1106-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
+      const model = process.env.OPENAI_MODEL || 'gpt-4.1';
+      const supportsJsonMode = ['gpt-4.1', 'gpt-5.2', 'gpt-4-turbo-preview', 'gpt-4-0125-preview', 'gpt-4-1106-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
       
       const requestConfig: any = {
         model: model,
