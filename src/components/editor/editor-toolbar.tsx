@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Save, Undo, Redo, Download, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWebsiteStore } from '@/store/website-store';
@@ -13,26 +14,40 @@ interface EditorToolbarProps {
 }
 
 export function EditorToolbar({ onToggleNavigator }: EditorToolbarProps) {
+  const params = useParams();
+  const projectId = params.id as string;
   const currentWebsite = useWebsiteStore((state) => state.currentWebsite);
   const { undo, redo, canUndo, canRedo } = useWebsiteStore();
   const { isSaving, setSaving } = useEditorStore();
   const [exportModalOpen, setExportModalOpen] = useState(false);
 
   const handleSave = async () => {
-    if (!currentWebsite) return;
+    if (!currentWebsite || !projectId) {
+      toast.error('Project ID not found');
+      return;
+    }
 
     setSaving(true);
     try {
-      const response = await fetch(`/api/projects/${currentWebsite.id}`, {
+      const response = await fetch(`/api/projects/${projectId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentWebsite),
+        body: JSON.stringify({
+          title: currentWebsite.metadata.title,
+          description: currentWebsite.metadata.description,
+          data: currentWebsite,
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to save');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Failed to save');
+      }
+
       toast.success('Project saved successfully');
     } catch (error) {
-      toast.error('Failed to save project');
+      console.error('Save error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to save project');
     } finally {
       setSaving(false);
     }

@@ -190,7 +190,7 @@ You MUST return ONLY valid JSON matching this exact structure. Do NOT include ma
 
 CRITICAL RULES:
 1. Generate 4-8 sections minimum (hero + 3-7 other sections)
-2. Always include a hero section as the first section WITH a backgroundImage
+2. Always include a hero section as the first section WITH a backgroundImage (MANDATORY - never skip this)
 3. Always include a footer as the last section
 4. Content must be REAL and relevant (no placeholders)
 5. Use appropriate section types based on the user's request
@@ -199,12 +199,14 @@ CRITICAL RULES:
 8. All text must be in English unless user specifies otherwise
 9. Make content compelling and conversion-focused
 10. Ensure mobile responsiveness in design decisions
-11. ALWAYS include images: hero sections MUST have backgroundImage, features should have images
+11. ALWAYS include images: hero sections MUST have backgroundImage in content object (e.g., "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"), features should have images for each feature
 12. Use high-quality image URLs from Unsplash or similar (e.g., "https://images.unsplash.com/photo-[ID]?w=1200&h=600&fit=crop")
 13. Include proper styling: gradients, shadows, rounded corners, hover effects
 14. Make sections visually appealing with proper spacing, typography, and color contrast
+15. For hero sections: The content object MUST include "backgroundImage" field with a valid image URL - this is non-negotiable
+16. Image URLs must be real, accessible URLs (use Unsplash photo IDs or similar services)
 
-Remember: Quality over quantity. Create a website that looks like it was designed by a top-tier agency.`;
+Remember: Quality over quantity. Create a website that looks like it was designed by a top-tier agency. NEVER generate a hero section without a backgroundImage.`;
   }
 
   private analyzePrompt(prompt: string): {
@@ -427,6 +429,15 @@ CRITICAL RULES:
 - The content object must maintain its structure (e.g., if it has "heading", "subheading", "features", etc., keep those keys)
 - The styles object must maintain its structure (e.g., if it has "backgroundColor", "padding", etc., keep those keys)
 
+IMAGE HANDLING (CRITICAL):
+- For hero sections: If user asks to add an image, add "backgroundImage" to the content object with a valid Unsplash URL
+- Example hero image URL: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"
+- For hero sections, you can also add "image" or "imageAlt" fields if needed
+- For feature sections: Add "image" or "icon" to each feature object
+- For about sections: Add "image" to the content object
+- Always use real, high-quality image URLs from Unsplash or similar services
+- Image URLs should be contextually relevant to the section content
+
 OUTPUT FORMAT:
 Return the complete section object with ALL fields, including:
 - id (must match original exactly)
@@ -436,7 +447,7 @@ Return the complete section object with ALL fields, including:
 - styles (modified according to instruction, but keep the same structure and keys)
 - visible (preserve original value)
 
-EXAMPLE:
+EXAMPLE - Adding image to hero section:
 If the original section has:
 {
   "id": "abc123",
@@ -445,14 +456,27 @@ If the original section has:
   "styles": { "backgroundColor": "#fff", "padding": { "top": "2rem" } }
 }
 
-And user says "make heading larger and change background to blue", return:
+And user says "add an image to the hero section", return:
+{
+  "id": "abc123",
+  "type": "hero",
+  "content": { 
+    "heading": "Hello", 
+    "subheading": "World",
+    "backgroundImage": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop",
+    "imageAlt": "Hero background image"
+  },
+  "styles": { "backgroundColor": "#fff", "padding": { "top": "2rem" } }
+}
+
+EXAMPLE - Modifying styles:
+If user says "make heading larger and change background to blue", return:
 {
   "id": "abc123",
   "type": "hero",
   "content": { "heading": "Hello", "subheading": "World" },
   "styles": { "backgroundColor": "#0000ff", "padding": { "top": "2rem" } }
-}
-(Note: You would also modify the heading size in styles, but this is just an example)`;
+}`;
 
       const userPrompt = `Current section (modify this according to the instruction):
 ${JSON.stringify(section, null, 2)}
@@ -513,8 +537,16 @@ IMPORTANT: Return the COMPLETE modified section as JSON. Include ALL fields (id,
       console.log('Original section:', section);
 
       // Deep merge content and styles to preserve structure
+      // This ensures new fields are added while preserving existing ones
       const mergedContent = parsedContent.content 
-        ? { ...section.content, ...parsedContent.content }
+        ? { 
+            ...section.content, 
+            ...parsedContent.content,
+            // Explicitly preserve image fields if they exist in either original or new
+            backgroundImage: parsedContent.content.backgroundImage || section.content.backgroundImage || parsedContent.content.image || section.content.image,
+            image: parsedContent.content.image || section.content.image || parsedContent.content.backgroundImage || section.content.backgroundImage,
+            imageAlt: parsedContent.content.imageAlt || section.content.imageAlt || parsedContent.content.alt || section.content.alt,
+          }
         : section.content;
       
       const mergedStyles = parsedContent.styles
