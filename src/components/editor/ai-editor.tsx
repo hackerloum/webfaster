@@ -101,30 +101,30 @@ export function AIEditor({ section }: AIEditorProps) {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <div>
-        <h4 className="text-sm font-medium mb-2">Describe the changes you want:</h4>
+        <h4 className="text-sm font-medium mb-2 text-white">Describe the changes you want:</h4>
         <textarea
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           placeholder="Example: Make the heading larger and change the background to a gradient"
           rows={6}
-          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none text-white placeholder:text-white/40"
           disabled={isGenerating}
         />
       </div>
 
       <Button
         onClick={handleModify}
-        className="w-full"
+        className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 disabled:opacity-30 shadow-lg shadow-purple-500/20"
         disabled={!instruction.trim() || isGenerating}
         leftIcon={isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
       >
         {isGenerating ? 'Modifying...' : 'Apply AI Changes'}
       </Button>
 
-      <div className="pt-4 border-t">
-        <p className="text-xs text-muted-foreground">
+      <div className="pt-4 border-t border-white/10">
+        <p className="text-xs text-white/50">
           The AI will modify this section based on your instruction. Changes will be applied immediately.
         </p>
       </div>
