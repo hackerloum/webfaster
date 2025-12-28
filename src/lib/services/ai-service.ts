@@ -403,8 +403,8 @@ User instruction: ${instruction}
 Return the modified section as JSON matching the original structure.`;
 
       const client = getOpenAIClient();
-      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo';
-      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-1106-preview'].includes(model);
+      const model = process.env.OPENAI_MODEL || 'gpt-4o';
+      const supportsJsonMode = ['gpt-4-turbo-preview', 'gpt-4-0125-preview', 'gpt-4-1106-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
       
       const requestConfig: any = {
         model: model,
@@ -455,8 +455,8 @@ Return the modified section as JSON matching the original structure.`;
   async suggestImprovements(section: Section): Promise<string[]> {
     try {
       const client = getOpenAIClient();
-      const model = process.env.OPENAI_MODEL || 'gpt-4-turbo';
-      const supportsJsonMode = ['gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-1106-preview'].includes(model);
+      const model = process.env.OPENAI_MODEL || 'gpt-4o';
+      const supportsJsonMode = ['gpt-4-turbo-preview', 'gpt-4-0125-preview', 'gpt-4-1106-preview', 'gpt-4o', 'gpt-4o-mini'].includes(model);
       
       const requestConfig: any = {
         model: model,
