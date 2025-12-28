@@ -47,6 +47,7 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
             ...updates,
             metadata: {
               ...section.metadata,
+              ...(updates.metadata || {}),
               lastEditedAt: new Date(),
             },
           }
@@ -62,7 +63,8 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
       },
     };
 
-    get().setWebsite(updatedWebsite);
+    // Force a new object reference to ensure React detects the change
+    get().setWebsite({ ...updatedWebsite });
   },
 
   addSection: (section, position) => {

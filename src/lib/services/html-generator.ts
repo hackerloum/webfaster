@@ -376,16 +376,29 @@ export class HTMLGenerator {
         });
 
         // Prevent any window.location changes
-        Object.defineProperty(window, 'location', {
-          value: {
-            ...window.location,
-            href: window.location.href,
-            assign: function() { console.log('Navigation blocked in preview mode'); },
-            replace: function() { console.log('Navigation blocked in preview mode'); },
-            reload: function() { console.log('Navigation blocked in preview mode'); }
-          },
-          writable: false
-        });
+        // Use try-catch since location might already be defined
+        try {
+          const originalLocation = window.location;
+          Object.defineProperty(window, 'location', {
+            get: function() { return originalLocation; },
+            set: function() { console.log('Navigation blocked in preview mode'); }
+          });
+        } catch (e) {
+          // Location property might not be redefinable, which is fine
+          // We'll rely on event prevention instead
+          console.log('Could not override location (expected in some browsers)');
+        }
+        
+        // Override location methods as a fallback
+        if (window.location.assign) {
+          window.location.assign = function() { console.log('Navigation blocked in preview mode'); };
+        }
+        if (window.location.replace) {
+          window.location.replace = function() { console.log('Navigation blocked in preview mode'); };
+        }
+        if (window.location.reload) {
+          window.location.reload = function() { console.log('Navigation blocked in preview mode'); };
+        }
       });
     `;
   }

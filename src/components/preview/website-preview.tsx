@@ -17,6 +17,15 @@ export function WebsitePreview() {
       const generator = new HTMLGenerator();
       const generatedHTML = generator.generateFullHTML(currentWebsite);
       setHtml(generatedHTML);
+      // Force iframe to reload by updating srcDoc
+      if (iframeRef.current) {
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          if (iframeRef.current) {
+            iframeRef.current.srcDoc = generatedHTML;
+          }
+        }, 0);
+      }
     }
   }, [currentWebsite]);
 
@@ -63,6 +72,7 @@ export function WebsitePreview() {
           className="bg-white shadow-2xl rounded-lg overflow-hidden border border-white/10 w-full max-w-full"
         >
           <iframe
+            key={html ? `preview-${currentWebsite?.id}-${Date.now()}` : 'preview-empty'}
             ref={iframeRef}
             srcDoc={html}
             className="w-full h-full border-0"
