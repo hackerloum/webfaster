@@ -247,16 +247,20 @@ export default function DashboardPage() {
                   Invite Team
                 </Button>
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold text-sm">
-                  {stats?.userName
-                    ? stats.userName
+                  {(() => {
+                    if (stats?.userName) {
+                      return stats.userName
                         .split(' ')
                         .map((n) => n[0])
                         .join('')
                         .toUpperCase()
-                        .slice(0, 2)
-                    : stats?.userEmail && stats.userEmail.length > 0
-                      ? stats.userEmail[0].toUpperCase()
-                      : 'U'}
+                        .slice(0, 2);
+                    }
+                    if (stats?.userEmail && stats.userEmail.length > 0) {
+                      return stats.userEmail[0].toUpperCase();
+                    }
+                    return 'U';
+                  })()}
                 </div>
               </div>
             </div>
