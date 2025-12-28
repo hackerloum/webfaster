@@ -26,90 +26,166 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
 interface Project {
   id: string;
-  name: string;
-  description: string;
-  thumbnail?: string;
+  title: string;
+  description: string | null;
   updatedAt: string;
-  status: 'draft' | 'published';
-  views: number;
+  createdAt: string;
+  status?: 'draft' | 'published';
+  views?: number;
+}
+
+interface DashboardStats {
+  totalProjects: number;
+  projectsThisWeek: number;
+  totalViews: number;
+  publishedSites: number;
+  userName: string | null;
+  userEmail: string;
 }
 
 export default function DashboardPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // TODO: Fetch actual projects from API
-    setTimeout(() => {
-      setProjects([
-        {
-          id: '1',
-          name: 'Portfolio Website',
-          description: 'Modern portfolio with animations',
-          updatedAt: '2024-01-15T10:30:00Z',
-          status: 'published',
-          views: 1234,
-        },
-        {
-          id: '2',
-          name: 'E-commerce Store',
-          description: 'Full-featured online store',
-          updatedAt: '2024-01-14T15:20:00Z',
-          status: 'draft',
-          views: 456,
-        },
-        {
-          id: '3',
-          name: 'Landing Page',
-          description: 'SaaS product landing page',
-          updatedAt: '2024-01-13T09:15:00Z',
-          status: 'published',
-          views: 890,
-        },
-      ]);
-      setIsLoading(false);
-    }, 500);
-  }, []);
+    const fetchData = async () => {
+      try {
+        // Fetch projects and stats in parallel
+        const [projectsRes, statsRes] = await Promise.all([
+          fetch('/api/projects'),
+          fetch('/api/dashboard/stats'),
+        ]);
 
-  const stats = [
-    {
-      label: 'Total Projects',
-      value: projects.length.toString(),
-      change: '+2 this week',
-      icon: FolderOpen,
-      color: 'from-purple-400 to-purple-600',
-      bgColor: 'bg-purple-500/10',
-    },
-    {
-      label: 'Total Views',
-      value: '2.5K',
-      change: '+12% this month',
-      icon: Eye,
-      color: 'from-blue-400 to-blue-600',
-      bgColor: 'bg-blue-500/10',
-    },
-    {
-      label: 'AI Generations',
-      value: '47',
-      change: '+8 today',
-      icon: Sparkles,
-      color: 'from-pink-400 to-pink-600',
-      bgColor: 'bg-pink-500/10',
-    },
-    {
-      label: 'Published Sites',
-      value: '2',
-      change: '1 pending',
-      icon: Globe,
-      color: 'from-green-400 to-green-600',
-      bgColor: 'bg-green-500/10',
-    },
-  ];
+        if (!projectsRes.ok) {
+          if (projectsRes.status === 401) {
+            router.push('/login');
+            return;
+          }
+          throw new Error('Failed to fetch projects');
+        }
+
+        if (!statsRes.ok) {
+          if (statsRes.status === 401) {
+            router.push('/login');
+            return;
+          }
+          throw new Error('Failed to fetch stats');
+        }
+
+        const projectsData = await projectsRes.json();
+        const statsData = await statsRes.json();
+
+        if (projectsData.success) {
+          // Transform API data to match component interface
+          const transformedProjects: Project[] = (projectsData.data || []).map((p: any) => ({
+            id: p.id,
+            title: p.title,
+            description: p.description || '',
+            updatedAt: p.updatedAt,
+            createdAt: p.createdAt,
+            status: 'draft' as const, // Default to draft for now
+            views: 0, // Placeholder until view tracking is implemented
+          }));
+          setProjects(transformedProjects);
+        }
+
+        if (statsData.success) {
+          setStats(statsData.data);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [router]);
+
+  const formatNumber = (num: number): string => {
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`;
+    }
+    return num.toString();
+  };
+
+  const dashboardStats = stats
+    ? [
+        {
+          label: 'Total Projects',
+          value: stats.totalProjects.toString(),
+          change: stats.projectsThisWeek > 0 ? `+${stats.projectsThisWeek} this week` : 'No new projects',
+          icon: FolderOpen,
+          color: 'from-purple-400 to-purple-600',
+          bgColor: 'bg-purple-500/10',
+        },
+        {
+          label: 'Total Views',
+          value: stats.totalViews > 0 ? formatNumber(stats.totalViews) : '0',
+          change: stats.totalViews > 0 ? 'Track views' : 'No views yet',
+          icon: Eye,
+          color: 'from-blue-400 to-blue-600',
+          bgColor: 'bg-blue-500/10',
+        },
+        {
+          label: 'AI Generations',
+          value: stats.totalProjects.toString(),
+          change: `${stats.projectsThisWeek} this week`,
+          icon: Sparkles,
+          color: 'from-pink-400 to-pink-600',
+          bgColor: 'bg-pink-500/10',
+        },
+        {
+          label: 'Published Sites',
+          value: stats.publishedSites.toString(),
+          change: stats.publishedSites < stats.totalProjects ? `${stats.totalProjects - stats.publishedSites} drafts` : 'All published',
+          icon: Globe,
+          color: 'from-green-400 to-green-600',
+          bgColor: 'bg-green-500/10',
+        },
+      ]
+    : [
+        {
+          label: 'Total Projects',
+          value: '0',
+          change: 'Loading...',
+          icon: FolderOpen,
+          color: 'from-purple-400 to-purple-600',
+          bgColor: 'bg-purple-500/10',
+        },
+        {
+          label: 'Total Views',
+          value: '0',
+          change: 'Loading...',
+          icon: Eye,
+          color: 'from-blue-400 to-blue-600',
+          bgColor: 'bg-blue-500/10',
+        },
+        {
+          label: 'AI Generations',
+          value: '0',
+          change: 'Loading...',
+          icon: Sparkles,
+          color: 'from-pink-400 to-pink-600',
+          bgColor: 'bg-pink-500/10',
+        },
+        {
+          label: 'Published Sites',
+          value: '0',
+          change: 'Loading...',
+          icon: Globe,
+          color: 'from-green-400 to-green-600',
+          bgColor: 'bg-green-500/10',
+        },
+      ];
 
   const quickActions = [
     {
@@ -171,7 +247,16 @@ export default function DashboardPage() {
                   Invite Team
                 </Button>
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold text-sm">
-                  JD
+                  {stats?.userName
+                    ? stats.userName
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)
+                    : stats?.userEmail
+                      ? stats.userEmail[0].toUpperCase()
+                      : 'U'}
                 </div>
               </div>
             </div>
@@ -190,7 +275,10 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2">
-                  Welcome back, <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">John</span>
+                  Welcome back,{' '}
+                  <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    {stats?.userName || stats?.userEmail?.split('@')[0] || 'User'}
+                  </span>
                 </h1>
                 <p className="text-white/60 text-base sm:text-lg">
                   Let&apos;s build something amazing today
@@ -214,7 +302,7 @@ export default function DashboardPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-8 sm:mb-12"
           >
-            {stats.map((stat, index) => (
+            {dashboardStats.map((stat, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -324,72 +412,81 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {projects.map((project, index) => (
-                  <motion.div
-                    key={project.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 + index * 0.05 }}
-                    className="group bg-white/[0.02] border border-white/[0.05] rounded-xl sm:rounded-2xl overflow-hidden hover:bg-white/[0.04] transition-all"
-                  >
-                    {/* Thumbnail */}
-                    <div className="aspect-video bg-gradient-to-br from-purple-500/20 to-blue-500/20 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px]" />
-                      <div className="absolute top-3 right-3 flex items-center gap-2">
-                        <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                          project.status === 'published'
-                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                            : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                        }`}>
-                          {project.status}
-                        </span>
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => router.push(`/editor/${project.id}`)}
-                            className="bg-white text-black hover:bg-white/90"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
+                {projects
+                  .filter((project) =>
+                    searchQuery
+                      ? project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
+                      : true
+                  )
+                  .map((project, index) => (
+                    <motion.div
+                      key={project.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.5 + index * 0.05 }}
+                      className="group bg-white/[0.02] border border-white/[0.05] rounded-xl sm:rounded-2xl overflow-hidden hover:bg-white/[0.04] transition-all"
+                    >
+                      {/* Thumbnail */}
+                      <div className="aspect-video bg-gradient-to-br from-purple-500/20 to-blue-500/20 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px]" />
+                        <div className="absolute top-3 right-3 flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                            project.status === 'published'
+                              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                          }`}>
+                            {project.status || 'draft'}
+                          </span>
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => router.push(`/editor/${project.id}`)}
+                              className="bg-white text-black hover:bg-white/90"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Content */}
-                    <div className="p-4 sm:p-5">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-purple-400 transition-colors">
-                          {project.name}
-                        </h3>
-                        <button className="text-white/40 hover:text-white/60 transition-colors">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4 line-clamp-2">
-                        {project.description}
-                      </p>
-                      <div className="flex items-center justify-between text-xs text-white/40">
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatDate(project.updatedAt)}</span>
+                      {/* Content */}
+                      <div className="p-4 sm:p-5">
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-purple-400 transition-colors">
+                            {project.title}
+                          </h3>
+                          <button className="text-white/40 hover:text-white/60 transition-colors">
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
-                          <span>{project.views}</span>
+                        <p className="text-xs sm:text-sm text-white/60 mb-3 sm:mb-4 line-clamp-2">
+                          {project.description || 'No description'}
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-white/40">
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{formatDate(project.updatedAt)}</span>
+                          </div>
+                          {project.views !== undefined && (
+                            <div className="flex items-center gap-1">
+                              <Eye className="w-3 h-3" />
+                              <span>{project.views}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  ))}
               </div>
             )}
           </motion.div>
