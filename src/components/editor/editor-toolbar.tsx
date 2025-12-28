@@ -39,12 +39,18 @@ export function EditorToolbar({ onToggleNavigator }: EditorToolbarProps) {
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-      <div className="flex items-center gap-2">
-        <Button size="sm" variant="ghost" onClick={onToggleNavigator}>
-          <Menu className="w-4 h-4" />
+    <div className="flex items-center justify-between px-6 py-4 bg-[#111118] border-b border-white/10 backdrop-blur-xl">
+      <div className="flex items-center gap-3">
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          onClick={onToggleNavigator}
+          className="text-white/70 hover:text-white hover:bg-white/10"
+        >
+          <Menu className="w-5 h-5" />
         </Button>
-        <h2 className="text-lg font-semibold">
+        <div className="h-6 w-px bg-white/10" />
+        <h2 className="text-lg font-semibold text-white">
           {currentWebsite?.metadata.title || 'Untitled Project'}
         </h2>
       </div>
@@ -55,6 +61,7 @@ export function EditorToolbar({ onToggleNavigator }: EditorToolbarProps) {
           variant="ghost"
           onClick={undo}
           disabled={!canUndo()}
+          className="text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30"
           leftIcon={<Undo className="w-4 h-4" />}
         >
           Undo
@@ -64,15 +71,18 @@ export function EditorToolbar({ onToggleNavigator }: EditorToolbarProps) {
           variant="ghost"
           onClick={redo}
           disabled={!canRedo()}
+          className="text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30"
           leftIcon={<Redo className="w-4 h-4" />}
         >
           Redo
         </Button>
+        <div className="h-6 w-px bg-white/10 mx-1" />
         <Button
           size="sm"
           variant="outline"
           onClick={handleSave}
           disabled={isSaving || !currentWebsite}
+          className="bg-white/5 text-white border-white/20 hover:bg-white/10 disabled:opacity-30"
           leftIcon={<Save className="w-4 h-4" />}
         >
           {isSaving ? 'Saving...' : 'Save'}
@@ -82,6 +92,7 @@ export function EditorToolbar({ onToggleNavigator }: EditorToolbarProps) {
           variant="default"
           onClick={() => setExportModalOpen(true)}
           disabled={!currentWebsite}
+          className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 disabled:opacity-30 shadow-lg shadow-purple-500/20"
           leftIcon={<Download className="w-4 h-4" />}
         >
           Export

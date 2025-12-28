@@ -80,29 +80,29 @@ export default function EditorPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#0A0A0F] overflow-hidden">
       {/* Section Navigator */}
       {showNavigator && (
-        <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+        <div className="w-72 bg-[#111118] border-r border-white/10 overflow-y-auto custom-scrollbar">
           <SectionNavigator />
         </div>
       )}
 
       {/* Main Editor Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Toolbar */}
         <EditorToolbar onToggleNavigator={() => setShowNavigator(!showNavigator)} />
 
         {/* Split View */}
         <div className="flex-1 flex overflow-hidden">
           {/* Preview */}
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto bg-[#0A0A0F]">
             <WebsitePreview />
           </div>
 
           {/* Editor Panel */}
           {selectedSectionId && (
-            <div className="w-96 bg-white border-l border-gray-200 overflow-y-auto">
+            <div className="w-[420px] bg-[#111118] border-l border-white/10 overflow-y-auto custom-scrollbar flex-shrink-0">
               <SectionEditor />
             </div>
           )}

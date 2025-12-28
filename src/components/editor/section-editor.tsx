@@ -20,26 +20,41 @@ export function SectionEditor() {
   if (!section) return null;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-[#111118]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div>
-          <h3 className="font-semibold">Edit Section</h3>
-          <p className="text-sm text-muted-foreground capitalize">{section.type}</p>
+          <h3 className="font-semibold text-white text-base">Edit Section</h3>
+          <p className="text-sm text-white/50 capitalize mt-0.5">{section.type}</p>
         </div>
-        <Button size="icon" variant="ghost" onClick={() => selectSection(null)}>
-          <X className="w-4 h-4" />
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          onClick={() => selectSection(null)}
+          className="text-white/70 hover:text-white hover:bg-white/10"
+        >
+          <X className="w-5 h-5" />
         </Button>
       </div>
 
       {/* Editor Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="w-full justify-start rounded-none border-b border-gray-200 bg-transparent">
-          <TabsTrigger value="manual">Manual Edit</TabsTrigger>
-          <TabsTrigger value="ai">AI Edit</TabsTrigger>
+        <TabsList className="w-full justify-start rounded-none border-b border-white/10 bg-transparent px-6">
+          <TabsTrigger 
+            value="manual"
+            className="text-white/70 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-purple-400"
+          >
+            Manual Edit
+          </TabsTrigger>
+          <TabsTrigger 
+            value="ai"
+            className="text-white/70 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-purple-400"
+          >
+            AI Edit
+          </TabsTrigger>
         </TabsList>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           <TabsContent value="manual" className="mt-0 h-full">
             <ManualEditor section={section} />
           </TabsContent>

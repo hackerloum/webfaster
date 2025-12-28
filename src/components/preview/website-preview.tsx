@@ -49,7 +49,7 @@ export function WebsitePreview() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-gray-100">
+    <div className="h-full flex flex-col bg-[#0A0A0F]">
       <ViewportControls />
 
       <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
@@ -60,7 +60,7 @@ export function WebsitePreview() {
             transformOrigin: 'top center',
             transition: 'all 0.3s ease',
           }}
-          className="bg-white shadow-2xl"
+          className="bg-white shadow-2xl rounded-lg overflow-hidden border border-white/10"
         >
           <iframe
             ref={iframeRef}
