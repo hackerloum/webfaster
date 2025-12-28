@@ -22,13 +22,14 @@ export function SectionNavigator() {
   const sortedSections = [...currentWebsite.sections].sort((a, b) => a.order - b.order);
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 md:p-4">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
         <h3 className="font-semibold text-white text-base">Sections</h3>
         <Button 
           size="sm" 
           variant="ghost"
           className="text-white/70 hover:text-white hover:bg-white/10"
+        title="Add Section"
         >
           <Plus className="w-4 h-4" />
         </Button>
