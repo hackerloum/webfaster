@@ -142,16 +142,18 @@ export class HTMLGenerator {
       css += `background-color: ${styles.backgroundColor};`;
     }
     if (styles.backgroundImage) {
-      css += `background-image: url(${styles.backgroundImage}); background-size: cover; background-position: center;`;
+      css += `background-image: url(${styles.backgroundImage}); background-size: cover; background-position: center; background-repeat: no-repeat;`;
     }
     if (styles.textColor) {
       css += `color: ${styles.textColor};`;
     }
     if (styles.padding) {
-      css += `padding: ${styles.padding.top} ${styles.padding.right} ${styles.padding.bottom} ${styles.padding.left};`;
+      const padding = styles.padding;
+      css += `padding: ${padding.top || '0'} ${padding.right || '0'} ${padding.bottom || '0'} ${padding.left || '0'};`;
     }
     if (styles.margin) {
-      css += `margin: ${styles.margin.top} ${styles.margin.right} ${styles.margin.bottom} ${styles.margin.left};`;
+      const margin = styles.margin;
+      css += `margin: ${margin.top || '0'} ${margin.right || '0'} ${margin.bottom || '0'} ${margin.left || '0'};`;
     }
     if (styles.borderRadius) {
       css += `border-radius: ${styles.borderRadius};`;
