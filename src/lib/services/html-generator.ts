@@ -95,14 +95,54 @@ export class HTMLGenerator {
         outline-offset: 4px;
       }
       
-      @media (max-width: 768px) {
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+      
+      /* Responsive Typography */
+      @media (max-width: 767px) {
         body {
           font-size: 14px;
         }
-        h1 { font-size: 2rem; }
-        h2 { font-size: 1.75rem; }
-        h3 { font-size: 1.5rem; }
-        h4 { font-size: 1.25rem; }
+        h1 { font-size: 2rem; line-height: 1.2; }
+        h2 { font-size: 1.75rem; line-height: 1.3; }
+        h3 { font-size: 1.5rem; line-height: 1.4; }
+        h4 { font-size: 1.25rem; line-height: 1.5; }
+        
+        .container {
+          padding: 0 1rem;
+        }
+        
+        button, .btn {
+          width: 100%;
+          padding: 1rem;
+          font-size: 1rem;
+        }
+      }
+      
+      @media (min-width: 768px) and (max-width: 1023px) {
+        body {
+          font-size: 15px;
+        }
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; }
+        h3 { font-size: 1.75rem; }
+        h4 { font-size: 1.5rem; }
+        
+        .container {
+          padding: 0 1.5rem;
+        }
+      }
+      
+      @media (min-width: 1024px) {
+        body {
+          font-size: 16px;
+        }
+        .container {
+          padding: 0 2rem;
+        }
       }
     `;
   }
@@ -215,19 +255,45 @@ export class HTMLGenerator {
     return `
       <section data-section-id="${section.id}" style="${styles} ${backgroundStyle}">
         ${imageErrorHandler}
-        <div class="container" style="text-align: center; padding: 5rem 1rem; width: 100%; ${textColor}">
-          <h1 style="${textColor} text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">${content.heading || 'Welcome'}</h1>
+        <style>
+          @media (max-width: 767px) {
+            [data-section-id="${section.id}"] .container {
+              padding: 3rem 1rem !important;
+            }
+            [data-section-id="${section.id}"] h1 {
+              font-size: 2rem !important;
+            }
+            [data-section-id="${section.id}"] p {
+              font-size: 1rem !important;
+            }
+            [data-section-id="${section.id}"] .btn {
+              width: 100% !important;
+              display: block !important;
+              margin-bottom: 1rem !important;
+            }
+            [data-section-id="${section.id}"] a[style*="margin-left"] {
+              margin-left: 0 !important;
+              width: 100% !important;
+              display: block !important;
+              text-align: center !important;
+            }
+          }
+        </style>
+        <div class="container" style="text-align: center; padding: 5rem 2rem; width: 100%; ${textColor}">
+          <h1 style="${textColor} text-shadow: 2px 2px 4px rgba(0,0,0,0.3); font-size: 3rem;">${content.heading || 'Welcome'}</h1>
           <p style="font-size: 1.25rem; margin-bottom: 2rem; ${textColor} text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">${content.subheading || ''}</p>
-          ${
-            content.ctaText
-              ? `<a href="${content.ctaLink || '#'}" class="btn" style="background-color: ${this.getPrimaryColor(section)}; color: white; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">${content.ctaText}</a>`
-              : ''
-          }
-          ${
-            content.secondaryCtaText
-              ? `<a href="${content.secondaryCtaLink || '#'}" style="margin-left: 1rem; padding: 1rem 2rem; border: 2px solid white; color: white; text-decoration: none; border-radius: 0.375rem; display: inline-block; font-weight: 600;">${content.secondaryCtaText}</a>`
-              : ''
-          }
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            ${
+              content.ctaText
+                ? `<a href="${content.ctaLink || '#'}" class="btn" style="background-color: ${this.getPrimaryColor(section)}; color: white; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">${content.ctaText}</a>`
+                : ''
+            }
+            ${
+              content.secondaryCtaText
+                ? `<a href="${content.secondaryCtaLink || '#'}" style="padding: 1rem 2rem; border: 2px solid white; color: white; text-decoration: none; border-radius: 0.375rem; display: inline-block; font-weight: 600;">${content.secondaryCtaText}</a>`
+                : ''
+            }
+          </div>
         </div>
       </section>
     `;
@@ -278,7 +344,17 @@ export class HTMLGenerator {
     return `
       <section data-section-id="${section.id}" style="${styles}">
         <div class="container" style="padding: 4rem 1rem;">
-          <div style="display: grid; grid-template-columns: ${hasImage ? '1fr 1fr' : '1fr'}; gap: 3rem; align-items: center;">
+          <style>
+            @media (max-width: 767px) {
+              [data-section-id="${section.id}"] .about-grid {
+                grid-template-columns: 1fr !important;
+              }
+              [data-section-id="${section.id}"] .container {
+                padding: 2rem 1rem !important;
+              }
+            }
+          </style>
+          <div class="about-grid" style="display: grid; grid-template-columns: ${hasImage ? '1fr 1fr' : '1fr'}; gap: 3rem; align-items: center;">
             ${hasImage ? `
             <div>
               <img src="${imageUrl}" alt="${imageAlt}" style="width: 100%; height: auto; border-radius: 1rem; box-shadow: 0 8px 16px rgba(0,0,0,0.1);" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1497366216548-37526070097c?w=800&h=1000&fit=crop';" />
@@ -306,7 +382,18 @@ export class HTMLGenerator {
           ${content.heading ? `<h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; font-weight: 700; color: #1f2937;">${content.heading}</h2>` : ''}
           ${content.subheading ? `<p style="text-align: center; font-size: 1.2rem; color: #6b7280; margin-bottom: 3rem; max-width: 700px; margin-left: auto; margin-right: auto;">${content.subheading}</p>` : ''}
           
-          <div style="display: grid; grid-template-columns: ${hasContactInfo ? '1fr 1fr' : '1fr'}; gap: 4rem; align-items: start;">
+          <style>
+            @media (max-width: 767px) {
+              [data-section-id="${section.id}"] .contact-grid {
+                grid-template-columns: 1fr !important;
+                gap: 2rem !important;
+              }
+              [data-section-id="${section.id}"] .container {
+                padding: 3rem 1rem !important;
+              }
+            }
+          </style>
+          <div class="contact-grid" style="display: grid; grid-template-columns: ${hasContactInfo ? '1fr 1fr' : '1fr'}; gap: 4rem; align-items: start;">
             <!-- Contact Form -->
             <div style="${hasContactInfo ? '' : 'max-width: 600px; margin: 0 auto;'}">
               <form style="display: flex; flex-direction: column; gap: 1.25rem; background: white; padding: 2.5rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">

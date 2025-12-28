@@ -57,6 +57,46 @@ DESIGN PRINCIPLES:
 7. **Accessibility**: High contrast ratios, semantic HTML, ARIA labels where needed
 8. **Modern Aesthetics**: Clean, minimal, with subtle gradients, shadows, and animations
 
+RESPONSIVE DESIGN REQUIREMENTS (CRITICAL - MUST FOLLOW):
+1. **Mobile-First Approach**: Always design for mobile (320px+) first, then enhance for tablets and desktops
+2. **Breakpoints**: Use standard breakpoints:
+   - Mobile: 320px - 767px (default, no media query needed)
+   - Tablet: 768px - 1023px (@media (min-width: 768px))
+   - Desktop: 1024px+ (@media (min-width: 1024px))
+3. **Typography Scaling**:
+   - Mobile: Smaller font sizes (h1: 2rem, h2: 1.5rem, base: 14-16px)
+   - Desktop: Larger font sizes (h1: 3-4rem, h2: 2.5rem, base: 16-18px)
+4. **Layout Responsiveness**:
+   - Grid columns: Use CSS Grid with auto-fit and minmax for responsive columns
+   - Example: grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))
+   - Mobile: Single column (1fr), Tablet: 2 columns, Desktop: 3-4 columns
+5. **Spacing & Padding**:
+   - Mobile: Smaller padding (1-2rem vertical, 1rem horizontal)
+   - Desktop: Larger padding (4-6rem vertical, 2rem horizontal)
+   - Use relative units (rem, em, %) instead of fixed pixels where possible
+6. **Images**:
+   - Always use responsive images: width: 100%, height: auto, object-fit: cover
+   - Use max-width: 100% to prevent overflow
+   - Ensure images scale properly on all screen sizes
+7. **Buttons & CTAs**:
+   - Mobile: Full width or near-full width buttons for easy tapping
+   - Desktop: Auto-width buttons
+   - Minimum touch target: 44px x 44px on mobile
+8. **Navigation & Menus**:
+   - Mobile: Hamburger menu, stacked navigation
+   - Desktop: Horizontal navigation
+9. **Section Heights**:
+   - Hero sections: 100vh on desktop, auto/min-height on mobile
+   - Other sections: Auto height based on content
+10. **Container Widths**:
+    - Mobile: Full width with padding (padding: 1rem)
+    - Desktop: Max-width container (max-width: 1200px, margin: 0 auto)
+11. **Touch-Friendly**:
+    - Larger tap targets on mobile (minimum 44px)
+    - Adequate spacing between clickable elements
+    - No hover-only interactions (always provide click alternative)
+12. **Viewport Meta Tag**: Always include: <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 CONTENT GUIDELINES:
 - Generate REAL, relevant content (never use "lorem ipsum" or placeholder text)
 - Content should be specific to the user's request and industry
@@ -95,15 +135,23 @@ SECTION TYPES & BEST PRACTICES:
 - MUST include: backgroundImage in content (use ONLY verified URLs from the IMAGE REQUIREMENTS list above)
 - Optional: Secondary CTA, overlay gradient for text readability
 - Background: Use backgroundImage with optional gradient overlay
-- Height: Full viewport or substantial (80-100vh on desktop)
+- Responsive Height: min-height: 100vh on desktop, min-height: 70vh on tablet, min-height: 60vh on mobile
+- Responsive Padding: padding: 5rem 2rem on desktop, padding: 4rem 1.5rem on tablet, padding: 3rem 1rem on mobile
+- Text Alignment: Center-aligned, responsive font sizes (h1: 3rem desktop, 2rem mobile)
+- CTA Buttons: Full-width on mobile (width: 100%), auto-width on desktop
 - Example: For tech/business use "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"
 
 **Features Section:**
 - 3-6 feature cards with icons/illustrations
 - Each feature: Icon/image URL, title (3-5 words), description (1-2 sentences)
 - Include image URLs for each feature using verified Unsplash URLs (use w=800&h=600 for feature images)
-- Grid layout: 3 columns on desktop, 2 on tablet, 1 on mobile
-- Use consistent card styling with hover effects, shadows, and rounded corners
+- Responsive Grid Layout: 
+  * Desktop (1024px+): 3 columns (grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)))
+  * Tablet (768px-1023px): 2 columns (auto-fit handles this)
+  * Mobile (<768px): 1 column (auto-fit handles this)
+- Responsive Padding: padding: 4rem 2rem on desktop, padding: 3rem 1.5rem on tablet, padding: 2rem 1rem on mobile
+- Card Styling: Consistent styling with hover effects (desktop only), shadows, rounded corners
+- Responsive Images: width: 100%, height: auto, object-fit: cover
 - Example feature images: Use variations of the verified URLs from IMAGE REQUIREMENTS with w=800&h=600
 
 **About Section:**
@@ -112,6 +160,12 @@ SECTION TYPES & BEST PRACTICES:
 - Key achievements or milestones
 - Team photos or company values
 - Can include stats/metrics
+- Responsive Layout:
+  * Desktop: 2-column grid (image + text side by side)
+  * Mobile: Single column (image above text, stacked)
+- Responsive Images: width: 100%, max-width: 100%, height: auto
+- Responsive Padding: padding: 4rem 2rem on desktop, padding: 3rem 1.5rem on tablet, padding: 2rem 1rem on mobile
+- Text: Responsive font sizes, proper line-height for readability
 
 **Services/Products:**
 - List of services/products with descriptions
@@ -248,15 +302,30 @@ CRITICAL RULES:
 7. Colors must be valid hex codes
 8. All text must be in English unless user specifies otherwise
 9. Make content compelling and conversion-focused
-10. Ensure mobile responsiveness in design decisions
+10. RESPONSIVE DESIGN IS MANDATORY: Every section MUST work perfectly on mobile (320px+), tablet (768px+), and desktop (1024px+)
 11. ALWAYS include images: hero sections MUST have backgroundImage in content object (e.g., "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop"), features should have images for each feature
 12. Use high-quality image URLs from Unsplash or similar (e.g., "https://images.unsplash.com/photo-[ID]?w=1200&h=600&fit=crop")
-13. Include proper styling: gradients, shadows, rounded corners, hover effects
+13. Include proper styling: gradients, shadows, rounded corners, hover effects (desktop only)
 14. Make sections visually appealing with proper spacing, typography, and color contrast
 15. For hero sections: The content object MUST include "backgroundImage" field with a valid image URL - this is non-negotiable
 16. Image URLs must be real, accessible URLs (use Unsplash photo IDs or similar services)
+17. RESPONSIVE PADDING: Use responsive padding values in styles (smaller on mobile, larger on desktop)
+18. RESPONSIVE FONT SIZES: Ensure font sizes scale appropriately for mobile vs desktop
+19. RESPONSIVE GRIDS: Use CSS Grid with auto-fit and minmax for all grid layouts
+20. TOUCH-FRIENDLY: Ensure all interactive elements are at least 44px x 44px on mobile
 
-Remember: Quality over quantity. Create a website that looks like it was designed by a top-tier agency. NEVER generate a hero section without a backgroundImage.`;
+RESPONSIVE DESIGN CHECKLIST (Must follow for every section):
+- ✅ Uses responsive grid/flexbox layouts (auto-fit, minmax, flex-wrap)
+- ✅ Padding scales: 1-2rem mobile, 3-4rem tablet, 4-6rem desktop
+- ✅ Font sizes scale: smaller on mobile, larger on desktop
+- ✅ Images use width: 100%, max-width: 100%, height: auto
+- ✅ Buttons are full-width on mobile, auto-width on desktop
+- ✅ Text is readable and properly sized for each breakpoint
+- ✅ No horizontal scrolling on any device
+- ✅ Proper spacing between elements on all screen sizes
+- ✅ Touch targets are at least 44px on mobile
+
+Remember: Quality over quantity. Create a website that looks like it was designed by a top-tier agency. NEVER generate a hero section without a backgroundImage. EVERY website MUST be fully responsive and work perfectly on mobile, tablet, and desktop devices.`;
   }
 
   private analyzePrompt(prompt: string): {
