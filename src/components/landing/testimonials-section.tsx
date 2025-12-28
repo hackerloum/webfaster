@@ -79,7 +79,7 @@ export function TestimonialsSection() {
                 </div>
 
                 {/* Content */}
-                <p className="text-white/80 mb-6 leading-relaxed">"{testimonial.content}"</p>
+                <p className="text-white/80 mb-6 leading-relaxed">&quot;{testimonial.content}&quot;</p>
 
                 {/* Author */}
                 <div className="flex items-center gap-3">

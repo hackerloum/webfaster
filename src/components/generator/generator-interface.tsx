@@ -14,7 +14,7 @@ interface GeneratorInterfaceProps {
 export function GeneratorInterface({ onGenerate }: GeneratorInterfaceProps) {
   const { prompt, setPrompt, isGenerating, progress } = useGenerationStore();
   const [localPrompt, setLocalPrompt] = useState('');
-  const headlineText = "We'll Build It";
+  const headlineText = `We${String.fromCharCode(39)}ll Build It`; // Escaped apostrophe
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

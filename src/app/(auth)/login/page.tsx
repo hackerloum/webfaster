@@ -112,7 +112,7 @@ export default function LoginPage() {
                 ))}
               </div>
               <p className="text-white/80 mb-4">
-                "This platform cut our website development time from weeks to hours. Absolutely game-changing for our agency."
+                &quot;This platform cut our website development time from weeks to hours. Absolutely game-changing for our agency.&quot;
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold">
@@ -283,7 +283,7 @@ export default function LoginPage() {
               {/* Sign Up Link */}
               <div className="mt-6 text-center">
                 <p className="text-sm text-white/60">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link href="/register" className="text-purple-400 hover:text-purple-300 font-medium">
                     Create account
                   </Link>
