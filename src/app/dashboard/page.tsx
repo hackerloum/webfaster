@@ -256,8 +256,9 @@ export default function DashboardPage() {
                         .toUpperCase()
                         .slice(0, 2);
                     }
-                    if (stats?.userEmail && stats.userEmail.length > 0) {
-                      return stats.userEmail[0].toUpperCase();
+                    const userEmail = stats?.userEmail;
+                    if (userEmail && userEmail.length > 0) {
+                      return userEmail[0].toUpperCase();
                     }
                     return 'U';
                   })()}
