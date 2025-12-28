@@ -97,27 +97,444 @@ export function ManualEditor({ section }: ManualEditorProps) {
             </>
           )}
 
-          {section.type === 'features' && (
-            <div>
-              <label className="block text-sm font-medium mb-2 text-white">Features (JSON)</label>
-              <textarea
-                value={JSON.stringify(editedContent.features || [], null, 2)}
-                onChange={(e) => {
-                  try {
-                    const parsed = JSON.parse(e.target.value);
-                    setEditedContent({ ...editedContent, features: parsed });
-                  } catch {
-                    // Invalid JSON, ignore
+          {section.type === 'about' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
                   }
-                }}
-                rows={10}
-                className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
-              />
-            </div>
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Description</label>
+                <textarea
+                  value={editedContent.description || editedContent.text || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, description: e.target.value, text: e.target.value })
+                  }
+                  rows={4}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Image URL</label>
+                <input
+                  type="text"
+                  value={editedContent.image || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, image: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                  placeholder="https://images.unsplash.com/..."
+                />
+              </div>
+              {editedContent.mission && (
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-white">Mission</label>
+                  <textarea
+                    value={editedContent.mission || ''}
+                    onChange={(e) =>
+                      setEditedContent({ ...editedContent, mission: e.target.value })
+                    }
+                    rows={2}
+                    className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                  />
+                </div>
+              )}
+            </>
           )}
 
-          {/* Generic content editor for other types */}
-          {!['hero', 'features'].includes(section.type) && (
+          {section.type === 'features' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Features (JSON)</label>
+                <textarea
+                  value={JSON.stringify(editedContent.features || [], null, 2)}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setEditedContent({ ...editedContent, features: parsed });
+                    } catch {
+                      // Invalid JSON, ignore
+                    }
+                  }}
+                  rows={10}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'contact' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Subheading</label>
+                <textarea
+                  value={editedContent.subheading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, subheading: e.target.value })
+                  }
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Email</label>
+                <input
+                  type="email"
+                  value={editedContent.email || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, email: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Phone</label>
+                <input
+                  type="tel"
+                  value={editedContent.phone || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, phone: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Address</label>
+                <textarea
+                  value={editedContent.address || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, address: e.target.value })
+                  }
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Business Hours</label>
+                <input
+                  type="text"
+                  value={editedContent.hours || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, hours: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                  placeholder="Monday - Friday: 9:00 AM - 6:00 PM"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'footer' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Company Name</label>
+                <input
+                  type="text"
+                  value={editedContent.companyName || editedContent.name || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, companyName: e.target.value, name: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Description</label>
+                <textarea
+                  value={editedContent.description || editedContent.text || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, description: e.target.value, text: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Copyright Text</label>
+                <input
+                  type="text"
+                  value={editedContent.copyright || `© ${new Date().getFullYear()} All rights reserved.`}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, copyright: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'cta' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Subheading</label>
+                <textarea
+                  value={editedContent.subheading || editedContent.text || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, subheading: e.target.value, text: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">CTA Text</label>
+                <input
+                  type="text"
+                  value={editedContent.ctaText || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, ctaText: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">CTA Link</label>
+                <input
+                  type="text"
+                  value={editedContent.ctaLink || '#'}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, ctaLink: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'services' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Subheading</label>
+                <textarea
+                  value={editedContent.subheading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, subheading: e.target.value })
+                  }
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Services (JSON)</label>
+                <textarea
+                  value={JSON.stringify(editedContent.services || editedContent.items || [], null, 2)}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setEditedContent({ ...editedContent, services: parsed, items: parsed });
+                    } catch {
+                      // Invalid JSON, ignore
+                    }
+                  }}
+                  rows={8}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'pricing' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Subheading</label>
+                <textarea
+                  value={editedContent.subheading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, subheading: e.target.value })
+                  }
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Plans (JSON)</label>
+                <textarea
+                  value={JSON.stringify(editedContent.plans || editedContent.pricing || editedContent.items || [], null, 2)}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setEditedContent({ ...editedContent, plans: parsed, pricing: parsed, items: parsed });
+                    } catch {
+                      // Invalid JSON, ignore
+                    }
+                  }}
+                  rows={10}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'testimonials' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Testimonials (JSON)</label>
+                <textarea
+                  value={JSON.stringify(editedContent.testimonials || editedContent.items || [], null, 2)}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setEditedContent({ ...editedContent, testimonials: parsed, items: parsed });
+                    } catch {
+                      // Invalid JSON, ignore
+                    }
+                  }}
+                  rows={10}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'team' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Subheading</label>
+                <textarea
+                  value={editedContent.subheading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, subheading: e.target.value })
+                  }
+                  rows={2}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Team Members (JSON)</label>
+                <textarea
+                  value={JSON.stringify(editedContent.members || editedContent.team || editedContent.items || [], null, 2)}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setEditedContent({ ...editedContent, members: parsed, team: parsed, items: parsed });
+                    } catch {
+                      // Invalid JSON, ignore
+                    }
+                  }}
+                  rows={10}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
+                />
+              </div>
+            </>
+          )}
+
+          {section.type === 'gallery' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Heading</label>
+                <input
+                  type="text"
+                  value={editedContent.heading || ''}
+                  onChange={(e) =>
+                    setEditedContent({ ...editedContent, heading: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder:text-white/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white">Images (JSON array of URLs)</label>
+                <textarea
+                  value={JSON.stringify(editedContent.images || editedContent.items || [], null, 2)}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      setEditedContent({ ...editedContent, images: parsed, items: parsed });
+                    } catch {
+                      // Invalid JSON, ignore
+                    }
+                  }}
+                  rows={8}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 font-mono text-xs text-white"
+                />
+              </div>
+            </>
+          )}
+
+          {/* Generic content editor for custom types */}
+          {!['hero', 'about', 'features', 'contact', 'footer', 'cta', 'services', 'pricing', 'testimonials', 'team', 'gallery'].includes(section.type) && (
             <div>
               <label className="block text-sm font-medium mb-2 text-white">Content (JSON)</label>
               <textarea

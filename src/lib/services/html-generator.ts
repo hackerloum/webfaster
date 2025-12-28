@@ -297,16 +297,122 @@ export class HTMLGenerator {
 
   private generateContactSection(section: Section, styles: string): string {
     const { content } = section;
+    const hasContactInfo = content.address || content.phone || content.email || content.hours;
+    const hasSocialLinks = content.socialLinks && Object.keys(content.socialLinks).length > 0;
+    
     return `
       <section data-section-id="${section.id}" style="${styles}">
-        <div class="container" style="padding: 4rem 1rem; max-width: 600px;">
-          <h2 style="text-align: center; margin-bottom: 2rem;">${content.heading || 'Contact Us'}</h2>
-          <form style="display: flex; flex-direction: column; gap: 1rem;">
-            <input type="text" placeholder="Name" style="padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
-            <input type="email" placeholder="Email" style="padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
-            <textarea placeholder="Message" rows="5" style="padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"></textarea>
-            <button type="submit">Send Message</button>
-          </form>
+        <div class="container" style="padding: 5rem 1rem; max-width: 1200px;">
+          ${content.heading ? `<h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem; font-weight: 700; color: #1f2937;">${content.heading}</h2>` : ''}
+          ${content.subheading ? `<p style="text-align: center; font-size: 1.2rem; color: #6b7280; margin-bottom: 3rem; max-width: 700px; margin-left: auto; margin-right: auto;">${content.subheading}</p>` : ''}
+          
+          <div style="display: grid; grid-template-columns: ${hasContactInfo ? '1fr 1fr' : '1fr'}; gap: 4rem; align-items: start;">
+            <!-- Contact Form -->
+            <div style="${hasContactInfo ? '' : 'max-width: 600px; margin: 0 auto;'}">
+              <form style="display: flex; flex-direction: column; gap: 1.25rem; background: white; padding: 2.5rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <input 
+                  type="text" 
+                  placeholder="${content.namePlaceholder || 'Your Name'}" 
+                  required
+                  style="padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;"
+                  onfocus="this.style.borderColor='#3b82f6';"
+                  onblur="this.style.borderColor='#e5e7eb';"
+                />
+                <input 
+                  type="email" 
+                  placeholder="${content.emailPlaceholder || 'your.email@example.com'}" 
+                  required
+                  style="padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;"
+                  onfocus="this.style.borderColor='#3b82f6';"
+                  onblur="this.style.borderColor='#e5e7eb';"
+                />
+                ${content.includePhone ? `
+                <input 
+                  type="tel" 
+                  placeholder="${content.phonePlaceholder || '+1 (555) 000-0000'}" 
+                  style="padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;"
+                  onfocus="this.style.borderColor='#3b82f6';"
+                  onblur="this.style.borderColor='#e5e7eb';"
+                />
+                ` : ''}
+                ${content.includeSubject ? `
+                <input 
+                  type="text" 
+                  placeholder="${content.subjectPlaceholder || 'How can we help?'}" 
+                  style="padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.2s;"
+                  onfocus="this.style.borderColor='#3b82f6';"
+                  onblur="this.style.borderColor='#e5e7eb';"
+                />
+                ` : ''}
+                <textarea 
+                  placeholder="${content.messagePlaceholder || 'Tell us about your project...'}" 
+                  rows="6" 
+                  required
+                  style="padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; resize: vertical; transition: border-color 0.2s; font-family: inherit;"
+                  onfocus="this.style.borderColor='#3b82f6';"
+                  onblur="this.style.borderColor='#e5e7eb';"
+                ></textarea>
+                <button 
+                  type="submit" 
+                  style="padding: 1rem 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 0.5rem; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(102, 126, 234, 0.4)';"
+                  onmouseout="this.style.transform=''; this.style.boxShadow='none';"
+                >
+                  ${content.submitText || 'Send Message'}
+                </button>
+                ${content.trustText ? `<p style="text-align: center; font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">${content.trustText}</p>` : ''}
+              </form>
+            </div>
+            
+            <!-- Contact Information -->
+            ${hasContactInfo ? `
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+              ${content.address ? `
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.5rem;">📍</span> Address
+                </h3>
+                <p style="color: #6b7280; line-height: 1.6;">${content.address}</p>
+              </div>
+              ` : ''}
+              ${content.phone ? `
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.5rem;">📞</span> Phone
+                </h3>
+                <a href="tel:${content.phone.replace(/[^0-9+]/g, '')}" style="color: #3b82f6; text-decoration: none; font-size: 1.1rem;">${content.phone}</a>
+              </div>
+              ` : ''}
+              ${content.email ? `
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.5rem;">✉️</span> Email
+                </h3>
+                <a href="mailto:${content.email}" style="color: #3b82f6; text-decoration: none; font-size: 1.1rem;">${content.email}</a>
+              </div>
+              ` : ''}
+              ${content.hours ? `
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.5rem;">🕒</span> Business Hours
+                </h3>
+                <p style="color: #6b7280; line-height: 1.6;">${content.hours}</p>
+              </div>
+              ` : ''}
+              ${hasSocialLinks ? `
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: #1f2937;">Follow Us</h3>
+                <div style="display: flex; gap: 1rem;">
+                  ${content.socialLinks.linkedin ? `<a href="${content.socialLinks.linkedin}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #0077b5; color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">in</a>` : ''}
+                  ${content.socialLinks.twitter ? `<a href="${content.socialLinks.twitter}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #1da1f2; color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🐦</a>` : ''}
+                  ${content.socialLinks.facebook ? `<a href="${content.socialLinks.facebook}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #1877f2; color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">f</a>` : ''}
+                  ${content.socialLinks.instagram ? `<a href="${content.socialLinks.instagram}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: white; border-radius: 50%; text-decoration: none; font-size: 1.25rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📷</a>` : ''}
+                </div>
+              </div>
+              ` : ''}
+            </div>
+            ` : ''}
+          </div>
         </div>
       </section>
     `;

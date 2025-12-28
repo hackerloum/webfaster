@@ -125,17 +125,56 @@ SECTION TYPES & BEST PRACTICES:
 - Star ratings (4-5 stars)
 - Rotating carousel or grid layout
 
-**Contact Section:**
-- Contact form with: Name, Email, Message (required fields)
-- Phone number, email, address
-- Social media links
-- Map integration placeholder
+**Contact Section (CRITICAL - Must be Professional):**
+- Professional heading: "Get in Touch", "Contact Us", or "Let's Connect"
+- Compelling subheading explaining why they should contact (e.g., "We'd love to hear from you", "Ready to start your project?")
+- Contact form with professional styling:
+  * Name field (required, placeholder: "Your Name")
+  * Email field (required, placeholder: "your.email@example.com")
+  * Phone field (optional, placeholder: "+1 (555) 000-0000")
+  * Subject field (optional, placeholder: "How can we help?")
+  * Message field (required, placeholder: "Tell us about your project...", rows: 5-6)
+  * Professional submit button text: "Send Message", "Submit", or "Get Started"
+- Contact information display (choose 2-3):
+  * Business address (formatted professionally)
+  * Phone number (formatted: +1 (555) 123-4567)
+  * Email address (professional domain)
+  * Business hours (e.g., "Monday - Friday: 9:00 AM - 6:00 PM EST")
+- Social media links (if applicable): LinkedIn, Twitter, Facebook, Instagram
+- Professional color scheme: Usually darker background (#1f2937, #111827) with light text, or light background with dark text
+- Include trust indicators: "We respond within 24 hours", "Secure & Confidential", etc.
+- Layout: Split layout (form on left/right, contact info on opposite side) OR centered form with contact info below
+- Spacing: Generous padding (4-6rem vertical, 2-3rem horizontal)
+- Visual elements: Subtle background pattern, gradient, or professional image
 
-**Footer:**
-- Links organized in columns (About, Services, Legal, etc.)
-- Social media icons
-- Copyright notice
-- Newsletter signup (optional)
+**Footer (CRITICAL - Must be Enterprise-Grade):**
+- Professional multi-column layout (3-4 columns on desktop, stacked on mobile)
+- Column 1 - Brand/Company Info:
+  * Company/Website name (bold, prominent)
+  * Tagline or brief description (1-2 sentences, professional)
+  * Social media icons (LinkedIn, Twitter, Facebook, Instagram, etc.)
+- Column 2 - Quick Links:
+  * "Product" or "Services" heading
+  * 4-6 relevant links (Features, Pricing, About, Blog, etc.)
+- Column 3 - Company/Support:
+  * "Company" or "Support" heading
+  * Links: About Us, Careers, Contact, Help Center, Documentation, etc.
+- Column 4 - Legal/Resources (optional):
+  * "Legal" or "Resources" heading
+  * Links: Privacy Policy, Terms of Service, Cookie Policy, Sitemap, etc.
+- Bottom section (full width):
+  * Horizontal divider/line
+  * Copyright notice: "© [Current Year] [Company Name]. All rights reserved."
+  * Additional legal text if needed
+  * Optional: Newsletter signup with email input and subscribe button
+- Professional styling:
+  * Dark background (#0f172a, #1e293b, or #111827) with light text
+  * Subtle borders/separators between sections
+  * Hover effects on links (color change, underline)
+  * Consistent spacing and typography
+  * Responsive: Stacks vertically on mobile
+- Content must be REAL and relevant - no placeholder links
+- Professional typography: Clear hierarchy, readable font sizes (14-16px for body, 18-20px for headings)
 
 COLOR SCHEME GUIDELINES:
 - **Tech/SaaS**: Blues, purples, teals (trust, innovation)
