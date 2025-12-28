@@ -254,7 +254,7 @@ export default function DashboardPage() {
                         .join('')
                         .toUpperCase()
                         .slice(0, 2)
-                    : stats?.userEmail
+                    : stats?.userEmail && stats.userEmail.length > 0
                       ? stats.userEmail[0].toUpperCase()
                       : 'U'}
                 </div>
