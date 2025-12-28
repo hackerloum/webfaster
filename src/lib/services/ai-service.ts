@@ -311,7 +311,7 @@ Generate the complete website structure as JSON now.`;
     options?: GenerationOptions
   ): Promise<WebsiteStructure> {
     try {
-      const enhancedPrompt = this.enhancePrompt(prompt, options);
+      let enhancedPrompt = this.enhancePrompt(prompt, options);
 
       const client = getOpenAIClient();
       
@@ -333,8 +333,12 @@ Generate the complete website structure as JSON now.`;
       };
 
       // Add JSON mode if supported
+      // Note: When using JSON mode, OpenAI requires the prompt to explicitly request JSON output
       if (supportsJsonMode) {
         requestConfig.response_format = { type: 'json_object' };
+        enhancedPrompt += '\n\nIMPORTANT: Respond with ONLY valid JSON. Do not include markdown code blocks, explanations, or any text outside the JSON object. Return pure JSON starting with { and ending with }.';
+        // Update the user message with the enhanced prompt
+        requestConfig.messages[1].content = enhancedPrompt;
       }
       
       const response = await client.chat.completions.create(requestConfig);
