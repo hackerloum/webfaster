@@ -424,15 +424,35 @@ CRITICAL RULES:
 - Apply the user's instruction precisely while keeping the structure intact
 - Return ONLY the modified section as valid JSON (no markdown, no explanations, no code blocks)
 - Start directly with { and end with }
+- The content object must maintain its structure (e.g., if it has "heading", "subheading", "features", etc., keep those keys)
+- The styles object must maintain its structure (e.g., if it has "backgroundColor", "padding", etc., keep those keys)
 
 OUTPUT FORMAT:
 Return the complete section object with ALL fields, including:
-- id (must match original)
-- type (must match original)
-- order (must match original)
-- content (modified according to instruction)
-- styles (modified according to instruction)
-- visible (preserve original value)`;
+- id (must match original exactly)
+- type (must match original exactly)
+- order (must match original exactly)
+- content (modified according to instruction, but keep the same structure and keys)
+- styles (modified according to instruction, but keep the same structure and keys)
+- visible (preserve original value)
+
+EXAMPLE:
+If the original section has:
+{
+  "id": "abc123",
+  "type": "hero",
+  "content": { "heading": "Hello", "subheading": "World" },
+  "styles": { "backgroundColor": "#fff", "padding": { "top": "2rem" } }
+}
+
+And user says "make heading larger and change background to blue", return:
+{
+  "id": "abc123",
+  "type": "hero",
+  "content": { "heading": "Hello", "subheading": "World" },
+  "styles": { "backgroundColor": "#0000ff", "padding": { "top": "2rem" } }
+}
+(Note: You would also modify the heading size in styles, but this is just an example)`;
 
       const userPrompt = `Current section (modify this according to the instruction):
 ${JSON.stringify(section, null, 2)}
