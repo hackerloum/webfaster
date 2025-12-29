@@ -14,6 +14,7 @@ export default function HomePage() {
   const { setGenerating, setProgress, setError } = useGenerationStore();
   const [showGenerator, setShowGenerator] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [projectName, setProjectName] = useState<string | null>(null);
 
   // Check if we should show generator from URL params (client-side only)
   useEffect(() => {
@@ -21,6 +22,11 @@ export default function HomePage() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('generate') === 'true') {
       setShowGenerator(true);
+    }
+    // Get project name from URL if provided
+    const nameParam = params.get('projectName');
+    if (nameParam) {
+      setProjectName(decodeURIComponent(nameParam));
     }
   }, []);
 
@@ -77,15 +83,28 @@ export default function HomePage() {
 
       // Save project to database
       try {
+        // Use project name from URL param if provided, otherwise use website title or default
+        const projectTitle = projectName || website.metadata?.title || website.title || 'Untitled Project';
+        
+        // Update website metadata with the project name
+        const websiteWithTitle = {
+          ...website,
+          metadata: {
+            ...website.metadata,
+            title: projectTitle,
+            updatedAt: new Date(),
+          },
+        };
+        
         const saveResponse = await fetch('/api/projects', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            title: website.title || 'Untitled Project',
-            description: website.description || null,
-            data: website,
+            title: projectTitle,
+            description: website.description || website.metadata?.description || null,
+            data: websiteWithTitle,
           }),
         });
 

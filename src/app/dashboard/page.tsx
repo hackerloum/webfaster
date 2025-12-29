@@ -53,6 +53,8 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showProjectNameDialog, setShowProjectNameDialog] = useState(false);
+  const [projectName, setProjectName] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,6 +111,17 @@ export default function DashboardPage() {
 
     fetchData();
   }, [router]);
+
+  const handleCreateProject = () => {
+    if (!projectName.trim()) {
+      toast.error('Please enter a project name');
+      return;
+    }
+    setShowProjectNameDialog(false);
+    // Navigate to homepage with project name in URL
+    const encodedName = encodeURIComponent(projectName.trim());
+    router.push(`/?generate=true&projectName=${encodedName}`);
+  };
 
   const formatNumber = (num: number): string => {
     if (num >= 1000) {
@@ -291,8 +304,8 @@ export default function DashboardPage() {
               <Button
                 size="lg"
                 onClick={() => {
-                  // Navigate to homepage and trigger generator
-                  router.push('/?generate=true');
+                  setProjectName('');
+                  setShowProjectNameDialog(true);
                 }}
                 className="bg-white text-black hover:bg-white/90 font-semibold h-12 sm:h-14 px-6 sm:px-8 w-full sm:w-auto"
               >
@@ -429,7 +442,10 @@ export default function DashboardPage() {
                 <p className="text-white/60 mb-6">Create your first website to get started</p>
                 <Button
                   size="lg"
-                  onClick={() => router.push('/?generate=true')}
+                  onClick={() => {
+                    setProjectName('');
+                    setShowProjectNameDialog(true);
+                  }}
                   className="bg-white text-black hover:bg-white/90 font-semibold"
                 >
                   <Plus className="w-5 h-5 mr-2" />
@@ -518,6 +534,52 @@ export default function DashboardPage() {
           </motion.div>
         </main>
       </div>
+
+      {/* Project Name Dialog */}
+      <Dialog open={showProjectNameDialog} onOpenChange={setShowProjectNameDialog}>
+        <DialogContent className="bg-[#111118] border-white/10 text-white sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-white">Name Your Project</DialogTitle>
+            <DialogDescription className="text-white/60">
+              Give your project a name to easily identify it later
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              type="text"
+              placeholder="e.g., My Portfolio Website"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && projectName.trim()) {
+                  handleCreateProject();
+                }
+              }}
+              className="bg-white/5 border-white/20 text-white placeholder:text-white/40 focus:ring-purple-500 focus:border-purple-500"
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowProjectNameDialog(false);
+                setProjectName('');
+              }}
+              className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateProject}
+              disabled={!projectName.trim()}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Create Project
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
